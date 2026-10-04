@@ -96,6 +96,7 @@ footer{background:var(--soft)}footer .w{display:grid;gap:1.5rem}footer a{display
 <div><h3>Company</h3><a href="#/about">About us</a><a href="#/privacy">Privacy policy</a><a href="#/terms">Terms &amp; conditions</a><a id="fb" href="#" rel="noopener">Facebook</a><a id="ig" href="#" rel="noopener">Instagram</a><a class="wl" href="#">WhatsApp</a><p class="mut">© Genesis Lifestyle</p></div></div></footer>
 <a class="wa wl" href="#" aria-label="Chat on WhatsApp">WhatsApp</a>
 <!-- Analytics integration points (add real IDs only): Meta Pixel, Google Analytics, Search Console verification tag -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 /* ===== EDIT HERE ===== */
 const CFG={wa:'8801608669888',fb:'https://www.facebook.com/genesislifestylee',ig:'https://www.instagram.com/genesislifestyle715',email:'genesislifestyle715@gmail.com',cur:'৳',
@@ -136,6 +137,23 @@ terms:['Terms & conditions',[['অর্ডার','Genesis Lifestyle আপন�
 /* ===== APP ===== */
 const $=s=>document.querySelector(s),M=n=>CFG.cur+n.toLocaleString('en-US');
 const COL={Navy:'#1F2A44',Black:'#1C1C1C',White:'#E9E9E4',Olive:'#59603F',Sand:'#C9BBA0',Grey:'#8C8F94',Maroon:'#6E1F2E',Teal:'#1F5A5E',Denim:'#24365E',Tan:'#B08D57',Beige:'#C8B98A',Mint:'#A9CFC4',Blue:'#2C4A6E',Rust:'#8A4B3B'},CATS=['Panjabi','Pants','Polos','Shirts','T-shirts','Accessories'],SZ=['S','M','L','XL','XXL'];
+const SB_URL='https://eivbfwwapalxxegxrndc.supabase.co',SB_KEY='sb_publishable_wCiaA3nANyjWU6-hi_FrTg_UqX9pBXv';
+let sb=null;try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
+async function loadProductsFromDB(){
+ if(!sb)return;
+ try{
+  const{data,error}=await sb.from('products').select('*');
+  if(error||!data||!data.length)return;
+  const mapped=data.map(d=>({id:d.id,n:d.name,c:d.category,p:d.price,desc:d.description,cols:d.colors||[],imgs:d.images||[]}));
+  P.length=0;mapped.forEach(m=>P.push(m));
+  cart=cart.filter(i=>P.some(p=>p.id===i.id));wish=wish.filter(id=>P.some(p=>p.id===id));
+  route(true);
+ }catch(e){/* keep static fallback silently */}
+}
+async function saveOrderToDB(o){
+ if(!sb)return;
+ try{await sb.from('orders').insert({customer_name:o.nm,phone:o.ph,address:o.fullAddr,items:o.itemsForDb,subtotal:o.sub,delivery_fee:o.f||0,total:o.t,notes:o.notes||null})}catch(e){/* WhatsApp flow still works even if this fails */}
+}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const mk=t=>t.replace(/\[([^\]]+)\]/g,'<mark>[$1]</mark>');
 let cart=[],wish=[],sel={},last=null,busy=false;
@@ -219,10 +237,12 @@ document.addEventListener('submit',e=>{e.preventDefault();const f=e.target.id,er
   if(v('ad').length<8)return er.textContent='পূর্ণ ঠিকানা লিখুন।';if(!v('di'))return er.textContent='জেলার নাম লিখুন।';if(!v('ar'))return er.textContent='এলাকা বা থানার নাম লিখুন।';
   busy=true;$('#po').disabled=true;$('#po').textContent='অর্ডার হচ্ছে...';const t=tot(v('di')),no='GL-'+Date.now().toString(36).toUpperCase();
   const lines=cart.map(i=>{const p=P.find(x=>x.id===i.id);return`${p.n} (${p.id}) ${i.s} ${i.c} x${i.q}`});
+  const itemsForDb=cart.map(i=>{const p=P.find(x=>x.id===i.id);return{id:i.id,name:p.n,qty:i.q,size:i.s,color:i.c,price:p.p}});
   last={no,nm:v('nm'),ph,ad:v('ad'),ar:v('ar'),di:v('di'),lines,t:t.t,f:t.f,txt:`New order ${no}\n${lines.join('\n')}\nSubtotal: ${M(t.sub)}\nDelivery: ${t.ft}\nPayment: Cash on delivery\nName: ${v('nm')}\nPhone: ${ph}\nAddress: ${v('ad')}, ${v('ar')}, ${v('di')}\nNotes: ${v('nt')||'-'}`};
+  saveOrderToDB({nm:v('nm'),ph,fullAddr:`${v('ad')}, ${v('ar')}, ${v('di')}`,itemsForDb,sub:t.sub,f:t.f,t:t.t,notes:v('nt')});
   cart=[];save();busy=false;goTo('#/done')}});
 document.querySelectorAll('.wl').forEach(a=>a.href=wa('Hello Genesis Lifestyle'));$('#fb').href=CFG.fb;$('#ig').href=CFG.ig;
-addEventListener('hashchange',()=>route());save();route();
+addEventListener('hashchange',()=>route());save();route();loadProductsFromDB();
 </script>
 </body>
 </html>
