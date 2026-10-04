@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Genesis Lifestyle — Admin</title>
+<style>
+  :root{--gold:#E2BE6A;--bg:#0F0E0C;--panel:#1a1816;--line:#333;--ink:#E9E2D0}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0}
+  header{background:#000;padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+  header h1{font-size:1.1rem;color:var(--gold);margin:0}
+  header button{background:none;border:1px solid var(--gold);color:var(--gold);padding:.4rem .9rem;border-radius:6px;cursor:pointer}
+  .wrap{max-width:1000px;margin:0 auto;padding:1.2rem}
+  .tabs{display:flex;gap:.5rem;margin-bottom:1.2rem}
+  .tab{padding:.5rem 1rem;border-radius:6px;border:1px solid var(--line);cursor:pointer;background:var(--panel);color:var(--ink)}
+  .tab.active{background:var(--gold);color:#14120F;border-color:var(--gold)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:1rem;margin-bottom:1rem}
+  label{display:block;font-size:.8rem;opacity:.8;margin-top:.7rem}
+  input,select,textarea{width:100%;padding:.55rem;margin-top:.25rem;border-radius:6px;border:1px solid #444;background:#111;color:#fff;box-sizing:border-box;font-family:inherit}
+  textarea{min-height:70px;resize:vertical}
+  button.primary{margin-top:1rem;padding:.6rem 1.2rem;background:var(--gold);color:#14120F;border:none;border-radius:6px;font-weight:600;cursor:pointer}
+  button.danger{background:#4a2020;color:#e08a8a;border:1px solid #6a2a2a;padding:.4rem .8rem;border-radius:6px;cursor:pointer}
+  button.secondary{background:none;border:1px solid var(--line);color:var(--ink);padding:.4rem .8rem;border-radius:6px;cursor:pointer}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  th,td{text-align:left;padding:.55rem;border-bottom:1px solid var(--line);vertical-align:top}
+  th{opacity:.7;font-weight:500}
+  .thumb{width:44px;height:56px;object-fit:cover;border-radius:4px;background:#333}
+  .pill{display:inline-block;padding:.15rem .5rem;border-radius:10px;font-size:.72rem;border:1px solid var(--line)}
+  .pill.new{color:#8fd19e;border-color:#2f5a3a}
+  .pill.processing{color:#e2c56a;border-color:#5a4a2a}
+  .pill.delivered{color:#8fd1c8;border-color:#2a5a52}
+  .pill.cancelled{color:#e08a8a;border-color:#5a2a2a}
+  .imgrow{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+  .imgrow img{width:50px;height:64px;object-fit:cover;border-radius:4px}
+  #loginScreen{max-width:360px;margin:4rem auto;padding:1.5rem}
+  .msg{font-size:.85rem;margin-top:.6rem}
+  .msg.err{color:#e08a8a}
+  .msg.ok{color:#8fd19e}
+  .hidden{display:none}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+  @media(max-width:600px){.row2{grid-template-columns:1fr}}
+  .small{font-size:.78rem;opacity:.7}
+  select[multiple]{height:auto}
+  .status-select{padding:.3rem;font-size:.8rem}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="card">
+  <h2 style="color:var(--gold);margin-top:0">Genesis Lifestyle Admin</h2>
+  <label>Email</label>
+  <input type="email" id="loginEmail">
+  <label>Password</label>
+  <input type="password" id="loginPassword">
+  <button class="primary" id="loginBtn">Login</button>
+  <div class="msg err" id="loginMsg"></div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <h1>Genesis Lifestyle — Admin</h1>
+    <button id="logoutBtn">Logout</button>
+  </header>
+  <div class="wrap">
+    <div class="tabs">
+      <div class="tab active" data-tab="products">Products</div>
+      <div class="tab" data-tab="orders">Orders</div>
+    </div>
+
+    <div id="tab-products">
+      <div class="card">
+        <h3 id="formTitle" style="margin-top:0">Add new product</h3>
+        <input type="hidden" id="p_editing_id">
+        <div class="row2">
+          <div>
+            <label>Product code / SKU</label>
+            <input id="p_id" placeholder="GL-XX-01">
+          </div>
+          <div>
+            <label>Name</label>
+            <input id="p_name">
+          </div>
+        </div>
+        <div class="row2">
+          <div>
+            <label>Category</label>
+            <select id="p_category">
+              <option>Panjabi</option>
+              <option>Pants</option>
+              <option>Polos</option>
+              <option>Shirts</option>
+              <option>T-shirts</option>
+              <option>Accessories</option>
+            </select>
+          </div>
+          <div>
+            <label>Price (৳)</label>
+            <input type="number" id="p_price">
+          </div>
+        </div>
+        <label>Description</label>
+        <textarea id="p_desc"></textarea>
+        <div class="row2">
+          <div>
+            <label>Colors (comma separated)</label>
+            <input id="p_colors" placeholder="Black, Navy">
+          </div>
+          <div>
+            <label>In stock?</label>
+            <select id="p_stock"><option value="true">Yes</option><option value="false">No</option></select>
+          </div>
+        </div>
+        <label>Product images (you can select multiple)</label>
+        <input type="file" id="p_images" accept="image/*" multiple>
+        <div class="imgrow" id="p_imgPreview"></div>
+        <button class="primary" id="p_saveBtn">Save product</button>
+        <button class="secondary" id="p_cancelBtn" style="margin-top:1rem;margin-left:.5rem">Cancel edit</button>
+        <div class="msg" id="p_msg"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">All products</h3>
+        <table>
+          <thead><tr><th>Img</th><th>Code</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+          <tbody id="productsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-orders" class="hidden">
+      <div class="card">
+        <h3 style="margin-top:0">Orders</h3>
+        <table>
+          <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL = "https://eivbfwwapalxxegxrndc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_wCiaA3nANyjWU6-hi_FrTg_UqX9pBXv";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const loginScreen = document.getElementById('loginScreen');
+const app = document.getElementById('app');
+
+async function checkSession(){
+  const { data } = await sb.auth.getSession();
+  if(data.session){
+    loginScreen.classList.add('hidden');
+    app.classList.remove('hidden');
+    loadProducts();
+    loadOrders();
+  } else {
+    loginScreen.classList.remove('hidden');
+    app.classList.add('hidden');
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const msg = document.getElementById('loginMsg');
+  msg.textContent = '';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ msg.textContent = error.message; return; }
+  checkSession();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  checkSession();
+});
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-products').classList.toggle('hidden', t.dataset.tab !== 'products');
+    document.getElementById('tab-orders').classList.toggle('hidden', t.dataset.tab !== 'orders');
+  });
+});
+
+// ---------- PRODUCTS ----------
+let pendingImageFiles = [];
+let editingImages = [];
+
+document.getElementById('p_images').addEventListener('change', (e) => {
+  pendingImageFiles = Array.from(e.target.files);
+  renderImagePreview();
+});
+
+function renderImagePreview(){
+  const box = document.getElementById('p_imgPreview');
+  box.innerHTML = '';
+  editingImages.forEach(url => {
+    const img = document.createElement('img');
+    img.src = url;
+    box.appendChild(img);
+  });
+  pendingImageFiles.forEach(f => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(f);
+    box.appendChild(img);
+  });
+}
+
+async function uploadImages(files, productId){
+  const urls = [];
+  for(const file of files){
+    const path = productId + '/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9.\-_]/g,'_');
+    const { error } = await sb.storage.from('product-images').upload(path, file, { upsert: true });
+    if(error){ throw error; }
+    const { data } = sb.storage.from('product-images').getPublicUrl(path);
+    urls.push(data.publicUrl);
+  }
+  return urls;
+}
+
+async function loadProducts(){
+  const { data, error } = await sb.from('products').select('*').order('category').order('id');
+  const body = document.getElementById('productsBody');
+  body.innerHTML = '';
+  if(error){ body.innerHTML = '<tr><td colspan="7">Error: '+error.message+'</td></tr>'; return; }
+  for(const p of data){
+    const tr = document.createElement('tr');
+    const img = (p.images && p.images[0]) ? '<img class="thumb" src="'+p.images[0]+'">' : '';
+    tr.innerHTML = `
+      <td>${img}</td>
+      <td>${p.id}</td>
+      <td>${p.name}</td>
+      <td>${p.category}</td>
+      <td>৳${p.price}</td>
+      <td>${p.in_stock ? 'In stock' : 'Out'}</td>
+      <td>
+        <button class="secondary" data-edit="${p.id}">Edit</button>
+        <button class="danger" data-del="${p.id}">Delete</button>
+      </td>`;
+    body.appendChild(tr);
+  }
+  body.querySelectorAll('[data-edit]').forEach(btn => {
+    btn.addEventListener('click', () => editProduct(btn.dataset.edit, data));
+  });
+  body.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => deleteProduct(btn.dataset.del));
+  });
+}
+
+function editProduct(id, data){
+  const p = data.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('formTitle').textContent = 'Edit product — ' + p.id;
+  document.getElementById('p_editing_id').value = p.id;
+  document.getElementById('p_id').value = p.id;
+  document.getElementById('p_id').disabled = true;
+  document.getElementById('p_name').value = p.name;
+  document.getElementById('p_category').value = p.category;
+  document.getElementById('p_price').value = p.price;
+  document.getElementById('p_desc').value = p.description || '';
+  document.getElementById('p_colors').value = (p.colors||[]).join(', ');
+  document.getElementById('p_stock').value = String(p.in_stock);
+  editingImages = p.images || [];
+  pendingImageFiles = [];
+  renderImagePreview();
+  window.scrollTo(0,0);
+}
+
+document.getElementById('p_cancelBtn').addEventListener('click', resetForm);
+
+function resetForm(){
+  document.getElementById('formTitle').textContent = 'Add new product';
+  document.getElementById('p_editing_id').value = '';
+  document.getElementById('p_id').value = '';
+  document.getElementById('p_id').disabled = false;
+  document.getElementById('p_name').value = '';
+  document.getElementById('p_category').value = 'Panjabi';
+  document.getElementById('p_price').value = '';
+  document.getElementById('p_desc').value = '';
+  document.getElementById('p_colors').value = '';
+  document.getElementById('p_stock').value = 'true';
+  document.getElementById('p_images').value = '';
+  editingImages = [];
+  pendingImageFiles = [];
+  renderImagePreview();
+  document.getElementById('p_msg').textContent = '';
+}
+
+document.getElementById('p_saveBtn').addEventListener('click', async () => {
+  const msg = document.getElementById('p_msg');
+  msg.className = 'msg';
+  msg.textContent = 'Saving...';
+  const id = document.getElementById('p_id').value.trim();
+  const name = document.getElementById('p_name').value.trim();
+  const category = document.getElementById('p_category').value;
+  const price = parseInt(document.getElementById('p_price').value, 10);
+  const description = document.getElementById('p_desc').value.trim();
+  const colors = document.getElementById('p_colors').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const in_stock = document.getElementById('p_stock').value === 'true';
+
+  if(!id || !name || !price){
+    msg.className = 'msg err'; msg.textContent = 'Product code, name ও price আবশ্যক।'; return;
+  }
+
+  try{
+    let images = editingImages;
+    if(pendingImageFiles.length){
+      const newUrls = await uploadImages(pendingImageFiles, id);
+      images = images.concat(newUrls);
+    }
+    const payload = {
+      id, name, category, price, description, colors, images,
+      sizes: ['S','M','L','XL','XXL'], in_stock
+    };
+    const { error } = await sb.from('products').upsert(payload, { onConflict: 'id' });
+    if(error) throw error;
+    msg.className = 'msg ok'; msg.textContent = 'Saved.';
+    resetForm();
+    loadProducts();
+  } catch(e){
+    msg.className = 'msg err'; msg.textContent = 'Error: ' + e.message;
+  }
+});
+
+async function deleteProduct(id){
+  if(!confirm('প্রোডাক্ট ' + id + ' ডিলিট করতে চান?')) return;
+  const { error } = await sb.from('products').delete().eq('id', id);
+  if(error){ alert('Error: ' + error.message); return; }
+  loadProducts();
+}
+
+// ---------- ORDERS ----------
+async function loadOrders(){
+  const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+  const body = document.getElementById('ordersBody');
+  body.innerHTML = '';
+  if(error){ body.innerHTML = '<tr><td colspan="7">Error: '+error.message+'</td></tr>'; return; }
+  for(const o of data){
+    const itemsSummary = (o.items||[]).map(it => (it.name||it.id) + ' x' + (it.qty||1)).join(', ');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${o.order_number||o.id.slice(0,8)}</td>
+      <td>${o.customer_name}</td>
+      <td>${o.phone}</td>
+      <td class="small">${itemsSummary}</td>
+      <td>৳${o.total}</td>
+      <td>
+        <select class="status-select" data-order="${o.id}">
+          <option value="new" ${o.status==='new'?'selected':''}>New</option>
+          <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
+          <option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option>
+          <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
+        </select>
+      </td>
+      <td class="small">${new Date(o.created_at).toLocaleString()}</td>`;
+    body.appendChild(tr);
+  }
+  body.querySelectorAll('.status-select').forEach(sel => {
+    sel.addEventListener('change', async () => {
+      const { error } = await sb.from('orders').update({ status: sel.value }).eq('id', sel.dataset.order);
+      if(error) alert('Error updating status: ' + error.message);
+    });
+  });
+}
+
+checkSession();
+</script>
+</body>
+</html>
