@@ -42,7 +42,7 @@ label{display:block;font-weight:500;margin:.9rem 0 .25rem}.er{color:#C0392B;font
 .hero .w{position:relative;padding:4.5rem 1.1rem;display:grid;gap:2rem;align-items:center}.hero p{max-width:32rem;font-size:1.15rem;opacity:.85}.hero .bt{background:#E2BE6A;color:#14120F;border-color:#E2BE6A}.hero .bt.o{background:none;color:#E2BE6A}
 .eyebrow{display:inline-block;color:#E2BE6A;font:600 .75rem/1 Jost,sans-serif;letter-spacing:.24em;text-transform:uppercase;margin-bottom:1.1rem;padding-bottom:.6rem;border-bottom:1px solid rgba(226,190,106,.4)}
 .htag{font-size:clamp(2.6rem,6.5vw,4.2rem);line-height:1.04;letter-spacing:-.01em}.htag span{display:block;color:#E2BE6A;font-style:italic;font-weight:500}
-.hshot{position:relative;height:320px;display:none}.hshot img{position:absolute;border-radius:10px;box-shadow:0 18px 40px rgba(0,0,0,.5);object-fit:cover}
+.hshot{position:relative;height:320px;display:none}.hshot img{transition:opacity .7s ease;position:absolute;border-radius:10px;box-shadow:0 18px 40px rgba(0,0,0,.5);object-fit:cover}
 .hshot .h1{width:230px;height:300px;left:10%;top:0;transform:rotate(-4deg);z-index:2}
 .hshot .h2{width:190px;height:250px;right:6%;bottom:0;transform:rotate(5deg);border:4px solid #0F0E0C}
 @media(min-width:900px){.hero .w{grid-template-columns:1.1fr .9fr}.hshot{display:block}}
@@ -172,7 +172,7 @@ const NAV=[['Home','#/'],['About','#/about'],['Contact','#/contact']];
 const SHOPNAV=[['All Products','#/shop'],['New Arrivals','#/shop?cat=new'],...CATS.map(c=>[c,'#/shop?cat='+c])];
 const tile=(p,c)=>(p.imgs||p.img)?`<div class="ph"><img src="${(p.imgs?p.imgs[0]:p.img)}" alt="${p.n}" loading="lazy"></div>`:`<div class="ph" style="background:${COL[c||p.cols[0]]}"><span>${p.c}<br>Photo to be added</span></div>`;
 const price=p=>`<p class="pr">${p.old?`<s class="mut">${M(p.old)}</s> `:''}${M(p.p)}${p.old?` <mark>-${Math.round(100-p.p*100/p.old)}%</mark>`:''}</p>`;
-const card=p=>`<article class="cd"><a href="#/product/${p.id}">${tile(p)}<h3>${p.n}</h3></a>${price(p)}<div class="sw">${p.cols.map(c=>`<i title="${c}" style="background:${COL[c]}"></i>`).join('')}</div><button class="hb" data-a="wish" data-id="${p.id}" aria-pressed="${wish.includes(p.id)}" aria-label="Save ${p.n} to wishlist">${wish.includes(p.id)?'♥':'♡'}</button><a class="bt s o" href="#/product/${p.id}">${szOf(p.c).length?'Choose size':'View details'}</a></article>`;
+const card=p=>`<article class="cd"><a href="#/product/${p.id}">${tile(p)}<h3>${p.n}</h3></a>${price(p)}<div class="sw">${p.cols.map(c=>`<i title="${c}" style="background:${COL[c]}"></i>`).join('')}</div><button class="hb" data-a="wish" data-id="${p.id}" aria-pressed="${wish.includes(p.id)}" aria-label="Save ${p.n} to wishlist">${wish.includes(p.id)?'♥':'♡'}</button><a class="bt s o" href="#/product/${p.id}">View details</a></article>`;
 const grid=l=>l.length?`<div class="g">${l.map(card).join('')}</div>`:'<p class="mut">No products found. Try another search or category.</p>';
 function tot(d){const sub=cart.reduce((a,i)=>a+P.find(p=>p.id===i.id).p*i.q,0),f=/bogura|bogra/i.test(d||'')?CFG.delivery.inside:CFG.delivery.outside;return{sub,f,t:sub+(f||0),ft:f==null?'ফোনে জানানো হবে':M(f)}}
 const V={
@@ -215,10 +215,17 @@ done:()=>{if(!last)return V[''](); const o=last;return['Order received | Genesis
 saved:()=>['Saved items | Genesis Lifestyle',`<section class="w"><h1>Saved items</h1>${(()=>{const l=P.filter(p=>wish.includes(p.id));return l.length?grid(l):'<p class="mut">আপনি এখনো কিছু সেভ করেননি। পছন্দের পণ্যের ♡ চাপুন, এখানে জমা থাকবে।</p><a class="bt" href="#/shop">Shop now</a>'})()}</section>`],
 size:()=>['Size guide | Genesis Lifestyle',`<section class="w"><h1>Size guide</h1><p class="mut">প্রতিটি সাইজের মাপ শিগগিরই এখানে যোগ করা হবে। সাইজ নিয়ে সন্দেহ থাকলে WhatsApp-এ জিজ্ঞেস করুন।</p><p><a class="bt" href="${wa('Size guide: আমি সাইজ সম্পর্কে জানতে চাই।')}" target="_blank" rel="noopener">WhatsApp-এ জিজ্ঞেস করুন</a></p></section>`],
 contact:()=>['Contact | Genesis Lifestyle',`<section class="w two"><div><h1>Contact</h1><p><b>Genesis Lifestyle</b><br>${ADDR.replace(/, /g,'<br>')}</p><p>Phone and WhatsApp: <a href="tel:+8801608669888">01608669888</a><br>Email: <a href="mailto:${CFG.email}">${CFG.email}</a><br>Showroom hours: 11 AM – 8 PM, closed on Fridays<br>Online orders: open at all times</p><div class="socs row2">${socHTML()}</div><p><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Police+Plaza+Bogura">Open Police Plaza, Bogura in Google Maps</a></p></div><form id="cf" novalidate><h2>Send a message</h2><label for="cn">Your name</label><input id="cn"><label for="cm">Message</label><textarea id="cm" rows="4"></textarea><p class="er" id="er" role="alert"></p><button class="bt">Send on WhatsApp</button></form></section>`]};
+let heroT=null;
+function heroInit(){clearInterval(heroT);const a=$('.hshot .h1'),b=$('.hshot .h2');if(!a||!b)return;
+ if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ const L=P.filter(p=>p.imgs&&p.imgs[0]).map(p=>p.imgs[0]);if(L.length<3)return;
+ let i=L.indexOf(a.getAttribute('src'));if(i<0)i=0;let k=0;
+ heroT=setInterval(()=>{if(document.hidden||!document.body.contains(a)){if(!document.body.contains(a))clearInterval(heroT);return}
+  const el=k%2?b:a;k++;i=(i+1)%L.length;const nx=L[i];const im=new Image();im.onload=()=>{el.style.opacity=0;setTimeout(()=>{el.src=nx;el.style.opacity=1},700)};im.src=nx},3200)}
 function route(keep,forceHash){const raw=forceHash!==undefined?forceHash:location.hash;const[h,qs]=(raw.slice(2)||'').split('?'),[r,a]=h.split('/'),q=new URLSearchParams(qs||''),sq=q.get('q');
  if(r==='product'&&sel.id!==a)sel={id:a};let t,html;
  if(V[r])[t,html]=V[r](r==='shop'?q:a);else if(PG[r]){t=PG[r][0]+' | Genesis Lifestyle';html=`<section class="w"><h1>${PG[r][0]}</h1>${PG[r][1].map(([x,y])=>`<h2>${x}</h2><p>${mk(y)}</p>`).join('')}</section>`}else[t,html]=V[''](); 
- document.title=t;$('#main').innerHTML=html;const so=$('#so');if(so)so.value=q.get('sort')||'new';if(!keep)window.scrollTo(0,0);$('#dr').hidden=true;
+ document.title=t;$('#main').innerHTML=html;heroInit();const so=$('#so');if(so)so.value=q.get('sort')||'new';if(!keep)window.scrollTo(0,0);$('#dr').hidden=true;
  $('#dn').innerHTML=`<a href="#/">Home</a><div class="dd"><button class="tb" data-a="ddtoggle" aria-expanded="false">Categories ▾</button><div class="ddm" hidden>${SHOPNAV.map(n=>`<a href="${n[1]}">${n[0]}</a>`).join('')}</div></div><form id="sf2" class="dsf" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="sq2" type="search" placeholder="Search products" aria-label="Search products"></form><a href="#/contact">Contact</a><a href="#/about">About</a>`;
  $('#dm').innerHTML='<button class="tb" data-a="menu">Close</button><a href="#/">Home</a><span class="mut" style="padding:.6rem 0 0;font-weight:500">Categories</span>'+SHOPNAV.map(n=>`<a class="sub" href="${n[1]}">${n[0]}</a>`).join('')+'<a href="#/about">About</a><a href="#/contact">Contact</a>'
  try{if(location.hash!==raw)location.hash=raw}catch(e){}}
