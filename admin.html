@@ -46,6 +46,20 @@
   .small{font-size:.78rem;opacity:.7}
   select[multiple]{height:auto}
   .status-select{padding:.3rem;font-size:.8rem}
+  .tscroll{overflow-x:auto}
+  @media(max-width:700px){
+    .wrap{padding:.8rem}
+    table,thead,tbody,tr,td{display:block;width:100%}
+    thead{display:none}
+    tr{border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;margin-bottom:.7rem;background:#14120f}
+    td{border:0;padding:.25rem 0;display:flex;justify-content:space-between;gap:1rem;text-align:right}
+    td[data-label]::before{content:attr(data-label);opacity:.6;text-align:left;flex:none}
+    td.c-name{font-weight:600;font-size:1rem;text-align:left;justify-content:flex-start}
+    td.c-name::before{display:none}
+    td.c-img{justify-content:flex-start}
+    td.c-act{justify-content:flex-start;gap:.5rem;padding-top:.5rem}
+    .status-select{font-size:.95rem;padding:.4rem}
+  }
 </style>
 </head>
 <body>
@@ -120,20 +134,20 @@
 
       <div class="card">
         <h3 style="margin-top:0">All products</h3>
-        <table>
+        <div class="tscroll"><table>
           <thead><tr><th>Img</th><th>Code</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>New?</th><th></th></tr></thead>
           <tbody id="productsBody"></tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
     <div id="tab-orders" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">Orders</h3>
-        <table>
-          <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+        <div class="tscroll"><table>
+          <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
           <tbody id="ordersBody"></tbody>
-        </table>
+        </table></div>
       </div>
     </div>
   </div>
@@ -258,14 +272,14 @@ async function loadProducts(){
     const tr = document.createElement('tr');
     const img = (p.images && p.images[0]) ? '<img class="thumb" src="'+p.images[0]+'">' : '';
     tr.innerHTML = `
-      <td>${img}</td>
-      <td>${p.id}</td>
-      <td>${p.name}</td>
-      <td>${p.category}</td>
-      <td>৳${p.price}</td>
-      <td>${stockSummary(p.stock, p.category)}</td>
-      <td>${p.is_new ? '<span class="pill new">New</span>' : ''}</td>
-      <td>
+      <td class="c-img">${img}</td>
+      <td data-label="Code">${p.id}</td>
+      <td data-label="Name" class="c-name">${p.name}</td>
+      <td data-label="Category">${p.category}</td>
+      <td data-label="Price">৳${p.price}</td>
+      <td data-label="Stock">${stockSummary(p.stock, p.category)}</td>
+      <td data-label="New?">${p.is_new ? '<span class="pill new">New</span>' : ''}</td>
+      <td class="c-act">
         <button class="secondary" data-edit="${p.id}">Edit</button>
         <button class="danger" data-del="${p.id}">Delete</button>
       </td>`;
@@ -371,17 +385,18 @@ async function loadOrders(){
   const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
   const body = document.getElementById('ordersBody');
   body.innerHTML = '';
-  if(error){ body.innerHTML = '<tr><td colspan="7">Error: '+error.message+'</td></tr>'; return; }
+  if(error){ body.innerHTML = '<tr><td colspan="8">Error: '+error.message+'</td></tr>'; return; }
   for(const o of data){
     const itemsSummary = (o.items||[]).map(it => (it.name||it.id) + ' x' + (it.qty||1)).join(', ');
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${o.order_number||o.id.slice(0,8)}</td>
-      <td>${o.customer_name}</td>
-      <td>${o.phone}</td>
-      <td class="small">${itemsSummary}</td>
-      <td>৳${o.total}</td>
-      <td>
+      <td data-label="Order #" class="c-name">${o.order_number||o.id.slice(0,8)}</td>
+      <td data-label="Customer">${o.customer_name}</td>
+      <td data-label="Phone"><a href="tel:${o.phone}" style="color:inherit">${o.phone}</a></td>
+      <td data-label="Address" class="small">${o.address||''}${o.notes?'<br>Note: '+o.notes:''}</td>
+      <td data-label="Items" class="small">${itemsSummary}</td>
+      <td data-label="Total">৳${o.total}</td>
+      <td data-label="Status">
         <select class="status-select" data-order="${o.id}">
           <option value="new" ${o.status==='new'?'selected':''}>New</option>
           <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
@@ -389,7 +404,7 @@ async function loadOrders(){
           <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
         </select>
       </td>
-      <td class="small">${new Date(o.created_at).toLocaleString()}</td>`;
+      <td data-label="Date" class="small">${new Date(o.created_at).toLocaleString()}</td>`;
     body.appendChild(tr);
   }
   body.querySelectorAll('.status-select').forEach(sel => {
