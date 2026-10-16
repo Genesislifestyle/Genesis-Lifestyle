@@ -60,6 +60,20 @@
     td.c-act{justify-content:flex-start;gap:.5rem;padding-top:.5rem}
     .status-select{font-size:.95rem;padding:.4rem}
   }
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-bottom:1rem}
+  @media(min-width:700px){.kpis{grid-template-columns:repeat(4,1fr)}}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.8rem}
+  .kpi b{display:block;font-size:1.5rem;color:var(--gold);margin-top:.2rem}
+  .kpi span{font-size:.78rem;opacity:.75}
+  .kpi small{display:block;font-size:.75rem;opacity:.65;margin-top:.15rem}
+  .two{display:grid;grid-template-columns:1fr;gap:1rem}@media(min-width:800px){.two{grid-template-columns:1fr 1fr}}
+  .chart7{display:flex;align-items:flex-end;gap:.5rem;height:130px}
+  .chart7 .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:.72rem}
+  .chart7 .bar{width:100%;max-width:38px;background:var(--gold);border-radius:4px 4px 0 0;min-height:2px}
+  .chart7 .n{margin-bottom:.2rem}.chart7 .d{opacity:.65;margin-top:.25rem}
+  .rowl{display:flex;justify-content:space-between;gap:1rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.88rem}
+  .otool{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}.otool select{width:auto;margin:0}
+  button.pr{background:none;border:1px solid var(--gold);color:var(--gold);padding:.35rem .8rem;border-radius:6px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -81,11 +95,22 @@
   </header>
   <div class="wrap">
     <div class="tabs">
-      <div class="tab active" data-tab="products">Products</div>
+      <div class="tab active" data-tab="dash">Dashboard</div>
+      <div class="tab" data-tab="products">Products</div>
       <div class="tab" data-tab="orders">Orders</div>
     </div>
 
-    <div id="tab-products">
+    <div id="tab-dash">
+      <div class="kpis" id="kpis"></div>
+      <div class="card"><h3 style="margin-top:0">শেষ ৭ দিনের অর্ডার</h3><div id="chart7" class="chart7"></div></div>
+      <div class="two">
+        <div class="card"><h3 style="margin-top:0">সবচেয়ে বেশি বিক্রি (শেষ ৩০ দিন)</h3><div id="topProducts" class="small">লোড হচ্ছে...</div></div>
+        <div class="card"><h3 style="margin-top:0">স্টক কম</h3><div id="lowStock" class="small">লোড হচ্ছে...</div></div>
+      </div>
+      <p class="small">বিক্রির হিসাবে বাতিল (Cancelled) অর্ডার ধরা হয় না।</p>
+    </div>
+
+    <div id="tab-products" class="hidden">
       <div class="card">
         <h3 id="formTitle" style="margin-top:0">Add new product</h3>
         <input type="hidden" id="p_editing_id">
@@ -144,8 +169,9 @@
     <div id="tab-orders" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">Orders</h3>
+        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="processing">Processing</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button></div>
         <div class="tscroll"><table>
-          <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+          <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead>
           <tbody id="ordersBody"></tbody>
         </table></div>
       </div>
@@ -194,6 +220,7 @@ document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
+    document.getElementById('tab-dash').classList.toggle('hidden', t.dataset.tab !== 'dash');
     document.getElementById('tab-products').classList.toggle('hidden', t.dataset.tab !== 'products');
     document.getElementById('tab-orders').classList.toggle('hidden', t.dataset.tab !== 'orders');
   });
@@ -268,6 +295,7 @@ async function loadProducts(){
   const body = document.getElementById('productsBody');
   body.innerHTML = '';
   if(error){ body.innerHTML = '<tr><td colspan="8">Error: '+error.message+'</td></tr>'; return; }
+  allProducts = data; renderDash();
   for(const p of data){
     const tr = document.createElement('tr');
     const img = (p.images && p.images[0]) ? '<img class="thumb" src="'+p.images[0]+'">' : '';
@@ -381,38 +409,155 @@ async function deleteProduct(id){
 }
 
 // ---------- ORDERS ----------
+let allProducts = [], allOrders = [];
+const esc = v => String(v==null?'':v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tk = n => '৳' + Number(n||0).toLocaleString('en-US');
+const dayKey = d => { const x = new Date(d); return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate(); };
+
+function payInfo(o){
+  const n = o.notes || '';
+  const m = n.match(/^Payment: bKash[^|]*\|\s*TrxID:\s*([A-Za-z0-9]+)/);
+  if(m) return { paid:true, label:'bKash (পরিশোধিত)', trx:m[1] };
+  return { paid:false, label:'ক্যাশ অন ডেলিভারি', trx:'' };
+}
+
 async function loadOrders(){
   const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
   const body = document.getElementById('ordersBody');
+  if(error){ body.innerHTML = '<tr><td colspan="9">Error: '+esc(error.message)+'</td></tr>'; return; }
+  allOrders = data; renderOrders(); renderDash();
+}
+
+function renderOrders(){
+  const body = document.getElementById('ordersBody');
+  const f = document.getElementById('ordFilter').value;
+  const list = allOrders.filter(o => f==='all' || o.status===f);
   body.innerHTML = '';
-  if(error){ body.innerHTML = '<tr><td colspan="8">Error: '+error.message+'</td></tr>'; return; }
-  for(const o of data){
-    const itemsSummary = (o.items||[]).map(it => (it.name||it.id) + ' x' + (it.qty||1)).join(', ');
+  if(!list.length){ body.innerHTML = '<tr><td colspan="9">কোনো অর্ডার নেই।</td></tr>'; return; }
+  for(const o of list){
+    const itemsSummary = (o.items||[]).map(it => (it.name||it.id) + (it.size&&it.size!=='Free'?' ('+it.size+')':'') + ' x' + (it.qty||1)).join(', ');
+    const p = payInfo(o);
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td data-label="Order #" class="c-name">${o.order_number||o.id.slice(0,8)}</td>
-      <td data-label="Customer">${o.customer_name}</td>
-      <td data-label="Phone"><a href="tel:${o.phone}" style="color:inherit">${o.phone}</a></td>
-      <td data-label="Address" class="small">${o.address||''}${o.notes?'<br>Note: '+o.notes:''}</td>
-      <td data-label="Items" class="small">${itemsSummary}</td>
-      <td data-label="Total">৳${o.total}</td>
+      <td data-label="Order #" class="c-name">${esc(o.order_number||o.id.slice(0,8))}</td>
+      <td data-label="Customer">${esc(o.customer_name)}</td>
+      <td data-label="Phone"><a href="tel:${esc(o.phone)}" style="color:inherit">${esc(o.phone)}</a></td>
+      <td data-label="Address" class="small">${esc(o.address||'')}${o.notes?'<br>'+esc(o.notes):''}</td>
+      <td data-label="Items" class="small">${esc(itemsSummary)}</td>
+      <td data-label="Total">${tk(o.total)}<br><span class="pill ${p.paid?'delivered':'processing'}">${p.paid?'bKash paid':'COD'}</span></td>
       <td data-label="Status">
-        <select class="status-select" data-order="${o.id}">
+        <select class="status-select" data-order="${esc(o.id)}">
           <option value="new" ${o.status==='new'?'selected':''}>New</option>
           <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
           <option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option>
           <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
         </select>
       </td>
-      <td data-label="Date" class="small">${new Date(o.created_at).toLocaleString()}</td>`;
+      <td data-label="Date" class="small">${esc(new Date(o.created_at).toLocaleString())}</td>
+      <td class="c-act"><button class="pr" data-print="${esc(o.id)}">Print</button></td>`;
     body.appendChild(tr);
   }
   body.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async () => {
       const { error } = await sb.from('orders').update({ status: sel.value }).eq('id', sel.dataset.order);
-      if(error) alert('Error updating status: ' + error.message);
+      if(error){ alert('Error updating status: ' + error.message); return; }
+      const o = allOrders.find(x => x.id === sel.dataset.order); if(o) o.status = sel.value;
+      renderDash();
+      if(document.getElementById('ordFilter').value!=='all') renderOrders();
     });
   });
+  body.querySelectorAll('[data-print]').forEach(b => b.addEventListener('click', () => printOrders([allOrders.find(x => x.id === b.dataset.print)])));
+}
+document.getElementById('ordFilter').addEventListener('change', renderOrders);
+document.getElementById('printNew').addEventListener('click', () => {
+  const l = allOrders.filter(o => o.status==='new').reverse();
+  if(!l.length){ alert('কোনো New অর্ডার নেই।'); return; }
+  printOrders(l);
+});
+
+// ---------- PRINT (invoice + delivery slip) ----------
+function slipHTML(o){
+  const p = payInfo(o);
+  const items = o.items || [];
+  const rows = items.map(it => `<tr><td>${esc(it.name||it.id)}<br><small>${esc(it.id||'')}${it.size&&it.size!=='Free'?' · Size '+esc(it.size):''}${it.color?' · '+esc(it.color):''}</small></td><td class="r">${it.qty||1}</td><td class="r">${tk(it.price)}</td><td class="r">${tk((it.price||0)*(it.qty||1))}</td></tr>`).join('');
+  const collect = p.paid ? 0 : o.total;
+  return `<section class="slip">
+    <div class="top"><div><h1>GENESIS LIFESTYLE</h1><div class="sm">Police Plaza, 5th Floor, Shop 511–512, Bogura<br>Phone / WhatsApp: 01608669888</div></div>
+    <div class="r"><div class="ono">${esc(o.order_number||o.id.slice(0,8))}</div><div class="sm">${esc(new Date(o.created_at).toLocaleString())}</div></div></div>
+    <div class="box"><b>Deliver to</b><div class="big">${esc(o.customer_name)}</div><div class="big">${esc(o.phone)}</div><div>${esc(o.address||'')}</div></div>
+    <table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Total</th></tr></thead><tbody>${rows}</tbody></table>
+    <table class="tot"><tr><td>Subtotal</td><td class="r">${tk(o.subtotal)}</td></tr><tr><td>Delivery</td><td class="r">${tk(o.delivery_fee)}</td></tr><tr><td><b>Order total</b></td><td class="r"><b>${tk(o.total)}</b></td></tr></table>
+    <div class="collect ${p.paid?'paid':''}"><div>Payment: ${esc(p.label)}${p.trx?' · TrxID '+esc(p.trx):''}</div><div class="amt">${p.paid?'COLLECT: ৳0 (PAID)':'COLLECT: '+tk(collect)}</div></div>
+    ${o.notes && !p.paid ? '<div class="sm">Note: '+esc(o.notes)+'</div>' : ''}
+    <div class="foot">ধন্যবাদ! Exchange: ২৪ ঘণ্টার মধ্যে WhatsApp 01608669888-এ ছবি/ভিডিওসহ জানান।</div>
+  </section>`;
+}
+function printOrders(list){
+  list = list.filter(Boolean); if(!list.length) return;
+  const css = `*{box-sizing:border-box}body{font-family:system-ui,'Noto Sans Bengali',sans-serif;margin:0;color:#111}
+  .slip{width:148mm;margin:0 auto;padding:8mm;page-break-after:always;border:1px solid #bbb}.slip:last-child{page-break-after:auto}
+  .top{display:flex;justify-content:space-between;gap:10px;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:8px}
+  h1{font-size:18px;margin:0;letter-spacing:.08em}.sm{font-size:11px;color:#444}.r{text-align:right}.ono{font-weight:700;font-size:15px}
+  .box{border:1px solid #111;padding:6px 8px;margin-bottom:8px}.big{font-size:15px;font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px}th,td{padding:4px 3px;border-bottom:1px solid #ccc;text-align:left;vertical-align:top}th.r,td.r{text-align:right}
+  .tot{width:60%;margin-left:auto}.tot td{border:0;padding:2px 3px}small{color:#555}
+  .collect{border:2px solid #111;padding:8px;text-align:center;margin:8px 0;font-size:12px}.collect .amt{font-size:22px;font-weight:800;margin-top:2px}.collect.paid{border-style:dashed}
+  .foot{font-size:10px;text-align:center;color:#444;margin-top:8px}
+  @media print{@page{size:A5;margin:6mm}.slip{border:0;padding:0;width:auto}}`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Orders</title><style>${css}</style></head><body>${list.map(slipHTML).join('')}</body></html>`;
+  const w = window.open('', '_blank');
+  if(w){
+    w.document.open(); w.document.write(html); w.document.close();
+    w.onload = () => { try{ w.focus(); w.print(); }catch(e){} };
+    setTimeout(() => { try{ w.focus(); w.print(); }catch(e){} }, 600);
+  } else {
+    const fr = document.createElement('iframe');
+    fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    document.body.appendChild(fr);
+    fr.contentDocument.open(); fr.contentDocument.write(html); fr.contentDocument.close();
+    setTimeout(() => { fr.contentWindow.focus(); fr.contentWindow.print(); setTimeout(() => fr.remove(), 4000); }, 400);
+  }
+}
+
+// ---------- DASHBOARD ----------
+function renderDash(){
+  const kp = document.getElementById('kpis'); if(!kp) return;
+  const live = allOrders.filter(o => o.status !== 'cancelled');
+  const now = new Date(), today = dayKey(now);
+  const mKey = now.getFullYear()+'-'+now.getMonth();
+  const todays = live.filter(o => dayKey(o.created_at) === today);
+  const month = live.filter(o => { const d = new Date(o.created_at); return d.getFullYear()+'-'+d.getMonth() === mKey; });
+  const sum = l => l.reduce((a, o) => a + (Number(o.total)||0), 0);
+  const newCnt = allOrders.filter(o => o.status==='new').length;
+  const procCnt = allOrders.filter(o => o.status==='processing').length;
+  const delivered = allOrders.filter(o => o.status==='delivered');
+  kp.innerHTML = `
+    <div class="kpi"><span>আজকের অর্ডার</span><b>${todays.length}</b><small>${tk(sum(todays))}</small></div>
+    <div class="kpi"><span>এই মাসের অর্ডার</span><b>${month.length}</b><small>${tk(sum(month))}</small></div>
+    <div class="kpi"><span>নতুন (New)</span><b>${newCnt}</b><small>Processing: ${procCnt}</small></div>
+    <div class="kpi"><span>Delivered</span><b>${delivered.length}</b><small>${tk(sum(delivered))}</small></div>`;
+  // 7 day chart
+  const days = [];
+  for(let i = 6; i >= 0; i--){ const d = new Date(); d.setDate(d.getDate() - i); days.push(d); }
+  const counts = days.map(d => live.filter(o => dayKey(o.created_at) === dayKey(d)).length);
+  const mx = Math.max(1, ...counts);
+  document.getElementById('chart7').innerHTML = days.map((d, i) => `<div class="col"><div class="n">${counts[i]}</div><div class="bar" style="height:${Math.round(counts[i]/mx*85)}%"></div><div class="d">${d.getDate()}/${d.getMonth()+1}</div></div>`).join('');
+  // top products last 30 days
+  const since = Date.now() - 30*864e5, tally = {};
+  live.filter(o => new Date(o.created_at).getTime() >= since).forEach(o => (o.items||[]).forEach(it => {
+    const k = it.name || it.id; tally[k] = tally[k] || { q:0, v:0 };
+    tally[k].q += (it.qty||1); tally[k].v += (it.price||0) * (it.qty||1);
+  }));
+  const top = Object.entries(tally).sort((a, b) => b[1].q - a[1].q).slice(0, 5);
+  document.getElementById('topProducts').innerHTML = top.length ? top.map(([n, v]) => `<div class="rowl"><span>${esc(n)}</span><span>${v.q} পিস · ${tk(v.v)}</span></div>`).join('') : 'এখনো কোনো বিক্রি নেই।';
+  // low stock
+  const low = [];
+  allProducts.forEach(p => {
+    const st = p.stock || {};
+    Object.keys(st).forEach(z => { const q = parseInt(st[z], 10) || 0; if(q <= 1) low.push({ n: p.name, z, q }); });
+  });
+  low.sort((a, b) => a.q - b.q);
+  document.getElementById('lowStock').innerHTML = allProducts.length ? (low.length ? low.slice(0, 12).map(l => `<div class="rowl"><span>${esc(l.n)} (${esc(l.z)})</span><span>${l.q === 0 ? '<span class="pill cancelled">শেষ</span>' : l.q + ' পিস'}</span></div>`).join('') + (low.length > 12 ? `<div class="small" style="margin-top:.4rem">আরও ${low.length-12}টি...</div>` : '') : 'সব ঠিক আছে।') : 'লোড হচ্ছে...';
 }
 
 renderStockRow('Panjabi', {});
