@@ -72,7 +72,8 @@
   .chart7 .bar{width:100%;max-width:38px;background:var(--gold);border-radius:4px 4px 0 0;min-height:2px}
   .chart7 .n{margin-bottom:.2rem}.chart7 .d{opacity:.65;margin-top:.25rem}
   .rowl{display:flex;justify-content:space-between;gap:1rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.88rem}
-  .otool{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}.otool select{width:auto;margin:0}
+  .ofgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;margin:.6rem 0}.ofrow{display:flex;justify-content:space-between;gap:.8rem;align-items:center;padding:.7rem 0;border-top:1px solid var(--line,#2a2a2a);flex-wrap:wrap}.ofact{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.otool{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}.otool select{width:auto;margin:0}
   button.pr{background:none;border:1px solid var(--gold);color:var(--gold);padding:.35rem .8rem;border-radius:6px;cursor:pointer}
 </style>
 </head>
@@ -98,6 +99,7 @@
       <div class="tab active" data-tab="dash">Dashboard</div>
       <div class="tab" data-tab="products">Products</div>
       <div class="tab" data-tab="orders">Orders</div>
+      <div class="tab" data-tab="offers">Offers</div>
     </div>
 
     <div id="tab-dash">
@@ -166,6 +168,29 @@
       </div>
     </div>
 
+    <div id="tab-offers" class="hidden">
+      <div class="card">
+        <h3 style="margin-top:0">নতুন অফার / কুপন</h3>
+        <p class="small">অফার চালু (ON) থাকলেই শুধু সাইটে ব্যানার ও কুপন বক্স দেখাবে। সব অফার বন্ধ করলে সাইটে কিছুই দেখাবে না।</p>
+        <div class="ofgrid">
+          <div><label>কুপন কোড</label><input id="of_code" placeholder="যেমন EID10" autocapitalize="characters"></div>
+          <div><label>ধরন</label><select id="of_kind"><option value="percent">শতকরা (%)</option><option value="flat">নির্দিষ্ট টাকা (৳)</option></select></div>
+          <div><label>পরিমাণ</label><input id="of_value" type="number" min="1" placeholder="10"></div>
+          <div><label>ন্যূনতম অর্ডার (৳)</label><input id="of_min" type="number" min="0" placeholder="0"></div>
+          <div><label>শেষ তারিখ (ঐচ্ছিক)</label><input id="of_exp" type="date"></div>
+          <div><label>সর্বোচ্চ ব্যবহার (ঐচ্ছিক)</label><input id="of_max" type="number" min="1" placeholder="যেমন 50"></div>
+        </div>
+        <label>সাইটের উপরের ব্যানার লেখা (ঐচ্ছিক)</label>
+        <input id="of_banner" placeholder="যেমন ঈদ অফার! কোড EID10 দিলে ১০% ছাড়">
+        <button class="primary" id="of_save" style="margin-top:.8rem">অফার যোগ করুন</button>
+        <span class="msg" id="of_msg"></span>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">সব অফার</h3>
+        <div id="offerList">লোড হচ্ছে...</div>
+      </div>
+    </div>
+
     <div id="tab-orders" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">Orders</h3>
@@ -195,6 +220,7 @@ async function checkSession(){
     app.classList.remove('hidden');
     loadProducts();
     loadOrders();
+    loadOffers();
   } else {
     loginScreen.classList.remove('hidden');
     app.classList.add('hidden');
@@ -223,6 +249,7 @@ document.querySelectorAll('.tab').forEach(t => {
     document.getElementById('tab-dash').classList.toggle('hidden', t.dataset.tab !== 'dash');
     document.getElementById('tab-products').classList.toggle('hidden', t.dataset.tab !== 'products');
     document.getElementById('tab-orders').classList.toggle('hidden', t.dataset.tab !== 'orders');
+    document.getElementById('tab-offers').classList.toggle('hidden', t.dataset.tab !== 'offers');
   });
 });
 
@@ -475,6 +502,55 @@ document.getElementById('printNew').addEventListener('click', () => {
   printOrders(l);
 });
 
+// ---------- OFFERS ----------
+async function loadOffers(){
+  const box = document.getElementById('offerList');
+  const { data, error } = await sb.from('coupons').select('*').order('created_at', { ascending: false });
+  if(error){ box.textContent = 'Error: ' + error.message + ' (coupons.sql চালানো হয়েছে?)'; return; }
+  if(!data.length){ box.textContent = 'এখনো কোনো অফার নেই।'; return; }
+  box.innerHTML = '';
+  data.forEach(c => {
+    const exp = c.expires_at ? new Date(c.expires_at) : null;
+    const expired = exp && exp < new Date();
+    const full = c.max_uses != null && c.used >= c.max_uses;
+    const live = c.active && !expired && !full;
+    const off = c.kind === 'percent' ? c.value + '%' : tk(c.value);
+    const d = document.createElement('div');
+    d.className = 'ofrow';
+    d.innerHTML = `<div><b>${esc(c.code)}</b> — ${off} ছাড়${c.min_order?' · ন্যূনতম '+tk(c.min_order):''}
+      <div class="small">ব্যবহার: ${c.used}${c.max_uses!=null?' / '+c.max_uses:''}${exp?' · শেষ: '+esc(exp.toLocaleDateString()):''}${c.banner?'<br>ব্যানার: '+esc(c.banner):''}</div></div>
+      <div class="ofact"><span class="pill ${live?'delivered':'cancelled'}">${live?'LIVE':(expired?'মেয়াদ শেষ':(full?'সীমা শেষ':'OFF'))}</span>
+      <button class="pr" data-tg="${esc(c.id)}" data-on="${c.active?1:0}">${c.active?'বন্ধ করুন':'চালু করুন'}</button>
+      <button class="pr" data-del="${esc(c.id)}">মুছুন</button></div>`;
+    box.appendChild(d);
+  });
+  box.querySelectorAll('[data-tg]').forEach(b => b.addEventListener('click', async () => {
+    const { error } = await sb.from('coupons').update({ active: b.dataset.on !== '1' }).eq('id', b.dataset.tg);
+    if(error) alert(error.message); else loadOffers();
+  }));
+  box.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
+    if(!confirm('এই অফারটি মুছে ফেলবেন?')) return;
+    const { error } = await sb.from('coupons').delete().eq('id', b.dataset.del);
+    if(error) alert(error.message); else loadOffers();
+  }));
+}
+document.getElementById('of_save').addEventListener('click', async () => {
+  const msg = document.getElementById('of_msg'), g = id => document.getElementById(id).value.trim();
+  const code = g('of_code').toUpperCase().replace(/\s+/g, ''), value = parseInt(g('of_value'), 10);
+  msg.className = 'msg';
+  if(!code){ msg.textContent = 'কুপন কোড লিখুন।'; return; }
+  if(!value || value < 1){ msg.textContent = 'ছাড়ের পরিমাণ লিখুন।'; return; }
+  if(g('of_kind') === 'percent' && value > 100){ msg.textContent = 'শতকরা ১০০ এর বেশি হবে না।'; return; }
+  const row = { code, kind: g('of_kind'), value, min_order: parseInt(g('of_min'), 10) || 0,
+    expires_at: g('of_exp') ? new Date(g('of_exp') + 'T23:59:59').toISOString() : null,
+    max_uses: parseInt(g('of_max'), 10) || null, banner: g('of_banner') || null, active: true };
+  const { error } = await sb.from('coupons').insert(row);
+  if(error){ msg.textContent = error.message.includes('duplicate') ? 'এই কোড আগে থেকেই আছে।' : 'Error: ' + error.message; return; }
+  msg.textContent = 'অফার চালু হয়েছে ✓';
+  ['of_code','of_value','of_min','of_exp','of_max','of_banner'].forEach(id => document.getElementById(id).value = '');
+  loadOffers();
+});
+
 // ---------- PRINT (invoice + delivery slip) ----------
 function slipHTML(o){
   const p = payInfo(o);
@@ -486,7 +562,7 @@ function slipHTML(o){
     <div class="r"><div class="ono">${esc(o.order_number||o.id.slice(0,8))}</div><div class="sm">${esc(new Date(o.created_at).toLocaleString())}</div></div></div>
     <div class="box"><b>Deliver to</b><div class="big">${esc(o.customer_name)}</div><div class="big">${esc(o.phone)}</div><div>${esc(o.address||'')}</div></div>
     <table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Total</th></tr></thead><tbody>${rows}</tbody></table>
-    <table class="tot"><tr><td>Subtotal</td><td class="r">${tk(o.subtotal)}</td></tr><tr><td>Delivery</td><td class="r">${tk(o.delivery_fee)}</td></tr><tr><td><b>Order total</b></td><td class="r"><b>${tk(o.total)}</b></td></tr></table>
+    <table class="tot"><tr><td>Subtotal</td><td class="r">${tk(o.subtotal)}</td></tr>${o.discount>0?`<tr><td>Discount${o.coupon_code?' ('+esc(o.coupon_code)+')':''}</td><td class="r">-${tk(o.discount)}</td></tr>`:''}<tr><td>Delivery</td><td class="r">${tk(o.delivery_fee)}</td></tr><tr><td><b>Order total</b></td><td class="r"><b>${tk(o.total)}</b></td></tr></table>
     <div class="collect ${p.paid?'paid':''}"><div>Payment: ${esc(p.label)}${p.trx?' · TrxID '+esc(p.trx):''}</div><div class="amt">${p.paid?'COLLECT: ৳0 (PAID)':'COLLECT: '+tk(collect)}</div></div>
     ${o.notes && !p.paid ? '<div class="sm">Note: '+esc(o.notes)+'</div>' : ''}
     <div class="foot">ধন্যবাদ! Exchange: ২৪ ঘণ্টার মধ্যে WhatsApp 01608669888-এ ছবি/ভিডিওসহ জানান।</div>
