@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://genesis-lifestyle.genesislifestyle715.workers.dev/sitemap.xml
