@@ -194,7 +194,7 @@
     <div id="tab-orders" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">Orders</h3>
-        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="processing">Processing</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button></div>
+        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="processing">Processing</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select id="ordMonth"><option value="all">সব মাস</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button><button class="secondary" id="csvBtn">Excel/CSV নামান</button></div>
         <div class="tscroll"><table>
           <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead>
           <tbody id="ordersBody"></tbody>
@@ -452,13 +452,24 @@ async function loadOrders(){
   const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
   const body = document.getElementById('ordersBody');
   if(error){ body.innerHTML = '<tr><td colspan="9">Error: '+esc(error.message)+'</td></tr>'; return; }
-  allOrders = data; renderOrders(); renderDash();
+  allOrders = data; fillMonths(); renderOrders(); renderDash();
 }
 
+const monthKey = d => { const x = new Date(d); return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0'); };
+function fillMonths(){
+  const sel = document.getElementById('ordMonth'), cur = sel.value;
+  const ms = [...new Set(allOrders.map(o => monthKey(o.created_at)))].sort().reverse();
+  sel.innerHTML = '<option value="all">সব মাস</option>' + ms.map(m => `<option value="${m}">${m}</option>`).join('');
+  if(ms.includes(cur)) sel.value = cur;
+}
+function shownOrders(){
+  const f = document.getElementById('ordFilter').value, m = document.getElementById('ordMonth').value;
+  return allOrders.filter(o => (f==='all' || o.status===f) && (m==='all' || monthKey(o.created_at)===m));
+}
 function renderOrders(){
   const body = document.getElementById('ordersBody');
   const f = document.getElementById('ordFilter').value;
-  const list = allOrders.filter(o => f==='all' || o.status===f);
+  const list = shownOrders();
   body.innerHTML = '';
   if(!list.length){ body.innerHTML = '<tr><td colspan="9">কোনো অর্ডার নেই।</td></tr>'; return; }
   for(const o of list){
@@ -481,7 +492,7 @@ function renderOrders(){
         </select>
       </td>
       <td data-label="Date" class="small">${esc(new Date(o.created_at).toLocaleString())}</td>
-      <td class="c-act"><button class="pr" data-print="${esc(o.id)}">Print</button></td>`;
+      <td class="c-act"><button class="pr" data-print="${esc(o.id)}">Print</button> ${o.steadfast_consignment_id ? `<span class="pill delivered" title="Steadfast consignment ${esc(o.steadfast_consignment_id)}">SF: ${esc(o.steadfast_tracking||o.steadfast_consignment_id)}</span>` : (o.status==='cancelled'?'':`<button class="pr" data-sf="${esc(o.id)}">Steadfast-এ পাঠান</button>`)}</td>`;
     body.appendChild(tr);
   }
   body.querySelectorAll('.status-select').forEach(sel => {
@@ -493,9 +504,56 @@ function renderOrders(){
       if(document.getElementById('ordFilter').value!=='all') renderOrders();
     });
   });
+  body.querySelectorAll('[data-sf]').forEach(b => b.addEventListener('click', async () => {
+    const o = allOrders.find(x => x.id === b.dataset.sf); if(!o) return;
+    const paid = /^Payment: bKash/.test(o.notes || '');
+    if(!confirm(`${o.customer_name} (${o.phone})\nSteadfast-এ পাঠাবেন?\nকালেক্ট করবে: ${paid ? '৳0 (bKash পেইড)' : tk(o.total)}`)) return;
+    b.disabled = true; b.textContent = 'পাঠানো হচ্ছে...';
+    try {
+      const { data, error } = await sb.functions.invoke('steadfast-send', { body: { order_id: o.id } });
+      let msg = data && data.error;
+      if(error && !msg){ try { const j = await error.context.json(); msg = j.error; } catch(e) { msg = 'ফাংশন পাওয়া যায়নি বা চালু নেই (steadfast-send deploy করা হয়েছে?)'; } }
+      if(msg){ alert(msg); b.disabled = false; b.textContent = 'Steadfast-এ পাঠান'; return; }
+      o.steadfast_consignment_id = String(data.consignment_id); o.steadfast_tracking = data.tracking; o.status = data.status;
+      renderOrders(); renderDash();
+      alert('Steadfast-এ পাঠানো হয়েছে ✓\nট্র্যাকিং কোড: ' + (data.tracking || data.consignment_id));
+    } catch(e) { alert('Error: ' + e.message); b.disabled = false; b.textContent = 'Steadfast-এ পাঠান'; }
+  }));
   body.querySelectorAll('[data-print]').forEach(b => b.addEventListener('click', () => printOrders([allOrders.find(x => x.id === b.dataset.print)])));
 }
 document.getElementById('ordFilter').addEventListener('change', renderOrders);
+document.getElementById('ordMonth').addEventListener('change', renderOrders);
+function csvCell(v){
+  let t = String(v==null?'':v).replace(/\r?\n/g, ' ');
+  if(/^[=+\-@]/.test(t)) t = "'" + t;
+  return '"' + t.replace(/"/g, '""') + '"';
+}
+document.getElementById('csvBtn').addEventListener('click', () => {
+  const list = shownOrders().slice().reverse();
+  if(!list.length){ alert('এই ফিল্টারে কোনো অর্ডার নেই।'); return; }
+  const head = ['তারিখ','অর্ডার নম্বর','কাস্টমার','ফোন','জেলা','উপজেলা','পুরো ঠিকানা','প্রোডাক্ট','মোট পিস','সাবটোটাল','ডেলিভারি','ছাড়','কুপন','মোট','পেমেন্ট','TrxID','স্ট্যাটাস','Steadfast ট্র্যাকিং'];
+  const rows = [head.map(csvCell).join(',')];
+  list.forEach(o => {
+    const parts = String(o.address||'').split(',').map(x => x.trim());
+    const dist = parts.length >= 2 ? parts[parts.length-1] : '', upz = parts.length >= 3 ? parts[parts.length-2] : '';
+    const items = o.items || [];
+    const prod = items.map(it => (it.name||it.id) + (it.size&&it.size!=='Free'?' ('+it.size+')':'') + ' x' + (it.qty||1)).join('; ');
+    const pcs = items.reduce((a, it) => a + (it.qty||1), 0);
+    const p = payInfo(o);
+    const d = new Date(o.created_at), pad = n => String(n).padStart(2,'0');
+    const date = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+    const phone = String(o.phone||'').replace(/\D/g, '');
+    const cells = [date, o.order_number||o.id.slice(0,8), o.customer_name, null, dist, upz, o.address, prod, pcs, o.subtotal, o.delivery_fee, o.discount||0, o.coupon_code||'', o.total, p.paid?'bKash':'COD', p.trx, o.status, o.steadfast_tracking||''];
+    rows.push(cells.map((c, i) => i===3 ? '="' + phone + '"' : csvCell(c)).join(','));
+  });
+  const blob = new Blob(['\uFEFF' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  const m = document.getElementById('ordMonth').value, f = document.getElementById('ordFilter').value;
+  a.href = URL.createObjectURL(blob);
+  a.download = 'genesis-orders-' + (m==='all'?'all':m) + (f==='all'?'':'-'+f) + '.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+});
 document.getElementById('printNew').addEventListener('click', () => {
   const l = allOrders.filter(o => o.status==='new').reverse();
   if(!l.length){ alert('কোনো New অর্ডার নেই।'); return; }
