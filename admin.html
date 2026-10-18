@@ -32,7 +32,13 @@
   .pill.delivered{color:#8fd1c8;border-color:#2a5a52}
   .pill.cancelled{color:#e08a8a;border-color:#5a2a2a}
   .imgrow{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
-  .imgrow img{width:50px;height:64px;object-fit:cover;border-radius:4px}
+.imgrow img{width:70px;height:88px;object-fit:cover;border-radius:4px;display:block}
+  .imgrow{gap:.6rem}.imgc{width:70px}.imgw{position:relative}
+  .imgw .cov,.imgw .newb{position:absolute;left:2px;font-size:.6rem;padding:1px 4px;border-radius:3px;background:#e0be6c;color:#111}
+  .imgw .cov{top:2px}.imgw .newb{bottom:2px;background:#2f5a3a;color:#fff}
+  .imgb{display:flex;gap:2px;margin-top:3px}
+  .imgb button{flex:1;padding:.25rem 0;font-size:.8rem;min-height:30px;border-radius:4px;border:1px solid var(--line,#444);background:transparent;color:inherit;cursor:pointer}
+  .imgb button:disabled{opacity:.3;cursor:default}.imgb .rm{color:#e08a8a}
   #loginScreen{max-width:360px;margin:4rem auto;padding:1.5rem}
   .msg{font-size:.85rem;margin-top:.6rem}
   .msg.err{color:#e08a8a}
@@ -151,7 +157,7 @@
         <div class="stockrow" id="p_stockrow"></div>
         <label>New arrival? (shows in homepage "New arrivals" row)</label>
         <select id="p_new"><option value="false">No</option><option value="true">Yes</option></select>
-        <label>Product images (you can select multiple)</label>
+        <label>Product images — একসাথে একাধিক বাছতে পারেন। ◀ ▶ দিয়ে ক্রম বদলান, ✕ দিয়ে মুছুন, প্রথম ছবিটাই Cover। <b>Save product</b> চাপলে তবেই বদলাবে।</label>
         <input type="file" id="p_images" accept="image/*" multiple>
         <div class="imgrow" id="p_imgPreview"></div>
         <button class="primary" id="p_saveBtn">Save product</button>
@@ -254,26 +260,32 @@ document.querySelectorAll('.tab').forEach(t => {
 });
 
 // ---------- PRODUCTS ----------
-let pendingImageFiles = [];
-let editingImages = [];
+// imgItems: ordered list of {url} (already saved) or {file} (new, not uploaded yet). First = cover.
+let imgItems = [];
 
 document.getElementById('p_images').addEventListener('change', (e) => {
-  pendingImageFiles = Array.from(e.target.files);
+  Array.from(e.target.files).forEach(f => imgItems.push({ file: f, preview: URL.createObjectURL(f) }));
+  e.target.value = '';
   renderImagePreview();
 });
 
 function renderImagePreview(){
   const box = document.getElementById('p_imgPreview');
   box.innerHTML = '';
-  editingImages.forEach(url => {
-    const img = document.createElement('img');
-    img.src = url;
-    box.appendChild(img);
-  });
-  pendingImageFiles.forEach(f => {
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(f);
-    box.appendChild(img);
+  if(!imgItems.length){ box.innerHTML = '<span class="small">এখনো কোনো ছবি নেই</span>'; return; }
+  imgItems.forEach((it, i) => {
+    const d = document.createElement('div');
+    d.className = 'imgc';
+    d.innerHTML = `<div class="imgw"><img src="${esc(it.url || it.preview)}" alt="">${i===0?'<span class="cov">Cover</span>':''}${it.file?'<span class="newb">নতুন</span>':''}</div>
+      <div class="imgb"><button type="button" data-mv="-1" ${i===0?'disabled':''} aria-label="আগে নিন">◀</button><button type="button" data-rm="1" class="rm" aria-label="মুছুন">✕</button><button type="button" data-mv="1" ${i===imgItems.length-1?'disabled':''} aria-label="পরে নিন">▶</button></div>`;
+    d.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => {
+      const j = i + parseInt(b.dataset.mv, 10);
+      if(j < 0 || j >= imgItems.length) return;
+      [imgItems[i], imgItems[j]] = [imgItems[j], imgItems[i]];
+      renderImagePreview();
+    }));
+    d.querySelector('[data-rm]').addEventListener('click', () => { imgItems.splice(i, 1); renderImagePreview(); });
+    box.appendChild(d);
   });
 }
 
@@ -362,8 +374,7 @@ function editProduct(id, data){
   document.getElementById('p_colors').value = (p.colors||[]).join(', ');
   renderStockRow(p.category, p.stock || {});
   document.getElementById('p_new').value = String(!!p.is_new);
-  editingImages = p.images || [];
-  pendingImageFiles = [];
+  imgItems = (p.images || []).map(url => ({ url }));
   renderImagePreview();
   window.scrollTo(0,0);
 }
@@ -383,8 +394,7 @@ function resetForm(){
   renderStockRow('Panjabi', {});
   document.getElementById('p_new').value = 'false';
   document.getElementById('p_images').value = '';
-  editingImages = [];
-  pendingImageFiles = [];
+  imgItems = [];
   renderImagePreview();
   document.getElementById('p_msg').textContent = '';
 }
@@ -409,11 +419,10 @@ document.getElementById('p_saveBtn').addEventListener('click', async () => {
   }
 
   try{
-    let images = editingImages;
-    if(pendingImageFiles.length){
-      const newUrls = await uploadImages(pendingImageFiles, id);
-      images = images.concat(newUrls);
-    }
+    const newFiles = imgItems.filter(it => it.file).map(it => it.file);
+    const newUrls = newFiles.length ? await uploadImages(newFiles, id) : [];
+    let k = 0;
+    const images = imgItems.map(it => it.url || newUrls[k++]);
     const payload = {
       id, name, category, price, description, colors, images,
       sizes: sizesFor(category), stock, in_stock, is_new
