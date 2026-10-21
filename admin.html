@@ -29,6 +29,7 @@
   .pill{display:inline-block;padding:.15rem .5rem;border-radius:10px;font-size:.72rem;border:1px solid var(--line)}
   .pill.new{color:#8fd19e;border-color:#2f5a3a}
   .pill.confirmed{color:#8fb8e8;border-color:#2a4a6a}
+  .pill.shipped{color:#c9a0f0;border-color:#4a3a6a}
   .pill.processing{color:#e2c56a;border-color:#5a4a2a}
   .pill.delivered{color:#8fd1c8;border-color:#2a5a52}
   .pill.cancelled{color:#e08a8a;border-color:#5a2a2a}
@@ -201,7 +202,7 @@
     <div id="tab-orders" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">Orders</h3>
-        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="processing">Processing</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select id="ordMonth"><option value="all">সব মাস</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button><button class="secondary" id="csvBtn">Excel/CSV নামান</button></div>
+        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select id="ordMonth"><option value="all">সব মাস</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button><button class="secondary" id="csvBtn">Excel/CSV নামান</button></div>
         <div class="tscroll"><table>
           <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead>
           <tbody id="ordersBody"></tbody>
@@ -498,6 +499,7 @@ function renderOrders(){
           <option value="new" ${o.status==='new'?'selected':''}>New</option>
           <option value="confirmed" ${o.status==='confirmed'?'selected':''}>Confirmed</option>
           <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
+          <option value="shipped" ${o.status==='shipped'?'selected':''}>Shipped</option>
           <option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option>
           <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
         </select>
@@ -508,9 +510,17 @@ function renderOrders(){
   }
   body.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async () => {
-      const { error } = await sb.from('orders').update({ status: sel.value }).eq('id', sel.dataset.order);
-      if(error){ alert('Error updating status: ' + error.message); return; }
-      const o = allOrders.find(x => x.id === sel.dataset.order); if(o) o.status = sel.value;
+      const o = allOrders.find(x => x.id === sel.dataset.order);
+      const prev = o ? o.status : 'new';
+      let patch = { status: sel.value };
+      if(sel.value === 'cancelled'){
+        const why = await askCancelReason();
+        if(why === null){ sel.value = prev; return; }
+        patch.cancel_reason = why;
+      } else if(prev === 'cancelled'){ patch.cancel_reason = null; }
+      const { error } = await sb.from('orders').update(patch).eq('id', sel.dataset.order);
+      if(error){ alert('Error updating status: ' + error.message + (/cancel_reason/.test(error.message) ? '\n(cancel-reason.sql চালানো হয়েছে?)' : '')); sel.value = prev; return; }
+      if(o){ o.status = sel.value; if('cancel_reason' in patch) o.cancel_reason = patch.cancel_reason; }
       renderDash();
       if(document.getElementById('ordFilter').value!=='all') renderOrders();
     });
@@ -665,6 +675,28 @@ function printOrders(list){
 }
 
 // ---------- DASHBOARD ----------
+function askCancelReason(){
+  return new Promise(res => {
+    const R = ['স্টকে নেই','সাইজ নেই','কাস্টমার বাতিল করেছেন','ফোনে পাওয়া যায়নি','ঠিকানায় ডেলিভারি সম্ভব না','অন্যান্য'];
+    const d = document.createElement('div');
+    d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+    d.innerHTML = `<div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:1.2rem;width:100%;max-width:380px;color:#eee">
+      <h3 style="margin:0 0 .3rem">অর্ডার বাতিলের কারণ</h3>
+      <p style="margin:0 0 .8rem;font-size:.85rem;color:#aaa">এটা কাস্টমার Track পেজে দেখতে পাবে।</p>
+      <select id="crS" style="width:100%;padding:.55rem;margin-bottom:.6rem">${R.map(x => `<option>${x}</option>`).join('')}</select>
+      <textarea id="crN" rows="3" placeholder="মন্তব্য (ঐচ্ছিক) — যেমন: XL নেই, M আছে" style="width:100%;padding:.55rem;box-sizing:border-box"></textarea>
+      <p id="crE" style="color:#e08a8a;font-size:.82rem;margin:.4rem 0 0;min-height:1em"></p>
+      <div style="display:flex;gap:.6rem;margin-top:.6rem"><button id="crX" style="flex:1;padding:.6rem">বাতিল না</button><button id="crO" style="flex:1;padding:.6rem;background:#c0392b;color:#fff;border:0;border-radius:4px">Cancel করুন</button></div></div>`;
+    document.body.appendChild(d);
+    const q = s => d.querySelector(s);
+    q('#crX').onclick = () => { d.remove(); res(null); };
+    q('#crO').onclick = () => {
+      const r = q('#crS').value, n = q('#crN').value.trim();
+      if(r === 'অন্যান্য' && !n){ q('#crE').textContent = '"অন্যান্য" হলে মন্তব্যে কারণ লিখুন।'; return; }
+      d.remove(); res(n ? (r === 'অন্যান্য' ? n : r + ' — ' + n) : r);
+    };
+  });
+}
 function renderDash(){
   const kp = document.getElementById('kpis'); if(!kp) return;
   const live = allOrders.filter(o => o.status !== 'cancelled');
@@ -674,12 +706,12 @@ function renderDash(){
   const month = live.filter(o => { const d = new Date(o.created_at); return d.getFullYear()+'-'+d.getMonth() === mKey; });
   const sum = l => l.reduce((a, o) => a + (Number(o.total)||0), 0);
   const newCnt = allOrders.filter(o => o.status==='new').length;
-  const procCnt = allOrders.filter(o => o.status==='processing').length;
+  const procCnt = allOrders.filter(o => o.status==='processing').length, shipCnt = allOrders.filter(o => o.status==='shipped').length;
   const delivered = allOrders.filter(o => o.status==='delivered');
   kp.innerHTML = `
     <div class="kpi"><span>আজকের অর্ডার</span><b>${todays.length}</b><small>${tk(sum(todays))}</small></div>
     <div class="kpi"><span>এই মাসের অর্ডার</span><b>${month.length}</b><small>${tk(sum(month))}</small></div>
-    <div class="kpi"><span>নতুন (New)</span><b>${newCnt}</b><small>Processing: ${procCnt}</small></div>
+    <div class="kpi"><span>নতুন (New)</span><b>${newCnt}</b><small>Processing: ${procCnt} · Shipped: ${shipCnt}</small></div>
     <div class="kpi"><span>Delivered</span><b>${delivered.length}</b><small>${tk(sum(delivered))}</small></div>`;
   // 7 day chart
   const days = [];
