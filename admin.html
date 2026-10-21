@@ -28,6 +28,7 @@
   .thumb{width:44px;height:56px;object-fit:cover;border-radius:4px;background:#333}
   .pill{display:inline-block;padding:.15rem .5rem;border-radius:10px;font-size:.72rem;border:1px solid var(--line)}
   .pill.new{color:#8fd19e;border-color:#2f5a3a}
+  .pill.confirmed{color:#8fb8e8;border-color:#2a4a6a}
   .pill.processing{color:#e2c56a;border-color:#5a4a2a}
   .pill.delivered{color:#8fd1c8;border-color:#2a5a52}
   .pill.cancelled{color:#e08a8a;border-color:#5a2a2a}
@@ -200,7 +201,7 @@
     <div id="tab-orders" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">Orders</h3>
-        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="processing">Processing</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select id="ordMonth"><option value="all">সব মাস</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button><button class="secondary" id="csvBtn">Excel/CSV নামান</button></div>
+        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="processing">Processing</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select id="ordMonth"><option value="all">সব মাস</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button><button class="secondary" id="csvBtn">Excel/CSV নামান</button></div>
         <div class="tscroll"><table>
           <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead>
           <tbody id="ordersBody"></tbody>
@@ -495,6 +496,7 @@ function renderOrders(){
       <td data-label="Status">
         <select class="status-select" data-order="${esc(o.id)}">
           <option value="new" ${o.status==='new'?'selected':''}>New</option>
+          <option value="confirmed" ${o.status==='confirmed'?'selected':''}>Confirmed</option>
           <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
           <option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option>
           <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
