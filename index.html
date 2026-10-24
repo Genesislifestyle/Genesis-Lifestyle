@@ -23,6 +23,10 @@
 <link rel="canonical" href="https://genesislifestylebd.com/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"ClothingStore","name":"Genesis Lifestyle","url":"https://genesislifestylebd.com/","image":"https://genesislifestylebd.com/og.jpg","priceRange":"৳৳","telephone":"+8801608669888","email":"genesislifestyle715@gmail.com","openingHours":"Sa-Th 11:00-20:00","address":{"@type":"PostalAddress","streetAddress":"Police Plaza, 5th Floor, Shop No. 511-512","addressLocality":"Bogura","addressCountry":"BD"}}</script>
 <link rel="icon" href="images/img-01.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://eivbfwwapalxxegxrndc.supabase.co" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#F7F7F5;--fg:#16181D;--soft:#ECECE8;--line:#DADAD4;--mut:#5C606A;--acc:#14120F;--on:#E2BE6A;--mk:#FFF1B8;
@@ -82,7 +86,7 @@ label{display:block;font-weight:500;margin:.9rem 0 .25rem}.er{color:#C0392B;font
 table{width:100%;border-collapse:collapse;margin:.5rem 0 1.5rem}td,th{border:1px solid var(--line);padding:.5rem;text-align:left}
 .ci{display:grid;grid-template-columns:72px 1fr auto;gap:.8rem;padding:1rem 0;border-bottom:1px solid var(--line);align-items:center}.ci .ph{aspect-ratio:1}.ci .ph span{display:none}
 .qt{display:inline-flex;align-items:center;border:1px solid var(--line)}.qt button{width:40px;height:40px;background:none;border:0;color:inherit;font-size:1.2rem;cursor:pointer}.qt span{min-width:2rem;text-align:center}
-.ann{background:var(--acc);color:var(--on);text-align:center;padding:.45rem 1rem;font-size:.9rem;font-weight:500}.ann[hidden]{display:none!important}
+.ann{background:var(--acc);color:var(--on);text-align:center;padding:.45rem 1rem;font-size:.9rem;font-weight:500;min-height:2.4rem;display:flex;align-items:center;justify-content:center;overflow:hidden}.ann .ans{display:inline-block;transition:transform .65s ease,opacity .65s ease}.ann .ans.out{opacity:0;transform:translateX(-110%)}.ann .ans.pre{opacity:0;transform:translateX(110%)}@media (prefers-reduced-motion:reduce){.ann .ans{transition:none}}.ann[hidden]{display:none!important}
 .cpn{margin:.4rem 0 .6rem}.cpn[hidden]{display:none!important}.cpn label{font-size:.9rem;display:block;margin-bottom:.25rem}.cpr{display:flex;gap:.5rem}.cpr input{flex:1;min-width:0;text-transform:uppercase}.cpr .bt{padding:.5rem 1rem;min-height:44px}.cpm{display:block;margin-top:.25rem;color:var(--mut)}.cpm a{text-decoration:underline}
 .sm{background:var(--soft);padding:1rem;border-radius:4px}.sm p{display:flex;justify-content:space-between;margin:.3rem 0}
 .od{max-width:640px}
@@ -108,6 +112,7 @@ table{width:100%;border-collapse:collapse;margin:.5rem 0 1.5rem}td,th{border:1px
 #lb{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;overflow:hidden}#lb[hidden]{display:none}#lb img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;transition:transform .2s}#lb img.z{transform:scale(2.4);cursor:zoom-out}#lb button{position:absolute;background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:99px;width:44px;height:44px;font-size:1.5rem;cursor:pointer;z-index:2}#lb .lbx{top:.8rem;right:.8rem;font-size:1.1rem}#lb .lbp{left:.6rem;top:50%;margin-top:-22px}#lb .lbn{right:.6rem;top:50%;margin-top:-22px}#lb .lbc{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);color:#fff;font-size:.85rem;background:rgba(0,0,0,.4);padding:.2rem .7rem;border-radius:99px}
 .pd>div:first-child .ph{cursor:zoom-in}
 .flt-w{margin:.8rem 0;border:1px solid var(--line);border-radius:6px;padding:.2rem .9rem}.flt-w summary{cursor:pointer;font-weight:600;padding:.6rem 0}.flt{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;padding:.2rem 0 .8rem}.flt select{width:100%}.flt-w .tb{margin-bottom:.8rem}
+.shr{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:1rem 0 .4rem;font-size:.9rem}.shr span{color:var(--mut);margin-right:.2rem}.shr a,.shr button{border:1px solid var(--line);background:none;color:var(--fg);border-radius:99px;padding:.35rem .85rem;font-size:.85rem;text-decoration:none;cursor:pointer;font-family:inherit}.shr a:hover,.shr button:hover{border-color:var(--acc)}
 .lowst{color:#C0392B;font-weight:600;font-size:.9rem;margin:.2rem 0 .6rem}
 .wa{position:fixed;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));z-index:15;background:#1E8E4E;color:#fff;border-radius:99px;padding:.8rem 1.2rem;text-decoration:none;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .soc{display:flex;align-items:center;gap:.55rem}.soc svg{width:1.25rem;height:1.25rem;flex:none}.socs.row2{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;margin:1rem 0}.socs.row2 .soc{display:inline-flex}.soc:hover{color:var(--acc)}
@@ -133,7 +138,7 @@ footer{background:var(--soft)}footer .w{display:grid;gap:1.5rem}footer a{display
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<div id="ann" class="ann" hidden></div>
+<div id="ann" class="ann"><span class="ans">জেনিসিস লাইফস্টাইলে আপনাকে স্বাগতম।</span></div>
 <header class="hd"><div class="bar">
 <button class="tb mb" data-a="menu" aria-label="Open menu"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
 <a class="logo" href="#/"><img src="images/img-02.png" alt="" width="47" height="44"><span>GENESIS LIFESTYLE</span></a>
@@ -146,7 +151,7 @@ footer{background:var(--soft)}footer .w{display:grid;gap:1.5rem}footer a{display
 <footer><div class="w">
 <div><h3>GENESIS LIFESTYLE</h3><p class="mut">Police Plaza, 5th Floor<br>Shop No. 511–512<br>Bogura, Bangladesh</p><p class="mut">01608669888<br>genesislifestyle715@gmail.com<br>11 AM – 8 PM, closed Fridays</p></div>
 <div><h3>Categories</h3><a href="#/shop?cat=new">New Arrivals</a><a href="#/shop?cat=Panjabi">Panjabi</a><a href="#/shop?cat=Shirts">Shirts</a><a href="#/shop?cat=Pants">Pants</a><a href="#/shop?cat=Polos">Polos</a><a href="#/shop?cat=T-shirts">T-shirts</a><a href="#/shop?cat=Accessories">Accessories</a></div>
-<div><h3>Customer service</h3><a href="#/contact">Contact</a><a href="#/track">Track order</a><a href="#/size">Size guide</a><a href="#/delivery">Delivery information</a><a href="#/returns">Return &amp; exchange</a></div>
+<div><h3>Customer service</h3><a href="#/contact">Contact</a><a href="#/track">Track order</a><a href="#/faq">FAQ</a><a href="#/size">Size guide</a><a href="#/delivery">Delivery information</a><a href="#/returns">Return &amp; exchange</a></div>
 <div><h3>Company</h3><a href="#/about">About</a><a href="#/privacy">Privacy policy</a><a href="#/terms">Terms &amp; conditions</a></div>
 <div><h3>Connect with us</h3><div id="soc" class="socs"></div></div></div>
 <div class="fbot"><div class="w"><p class="mut">© <span id="yr"></span> Genesis Lifestyle. All rights reserved.</p></div></div></footer>
@@ -210,7 +215,14 @@ async function loadProductsFromDB(){
 }
 function cpUpd(){const d=($('#di')||{value:''}).value.trim(),t=tot(d);if(!$('#tt'))return;const dv=$('#dv'),ds=$('#dsr');if(ds){ds.hidden=!t.disc;dv.textContent='-'+M(t.disc)}$('#tt').textContent=M(d?t.t:t.net);if($('#pay'))$('#pay').textContent=M(d?t.t:t.net)}
 async function cpApply(){const code=($('#cpi').value||'').trim(),m=$('#cpm');if(!code){m.textContent='কুপন কোড লিখুন।';return}if(!sb){m.textContent='এখন কুপন যাচাই করা যাচ্ছে না।';return}m.textContent='যাচাই হচ্ছে...';try{const{data,error}=await sb.rpc('check_coupon',{p_code:code,p_sub:tot().sub});if(error||!data){m.textContent='কুপন যাচাই করা যায়নি, আবার চেষ্টা করুন।';return}if(!data.ok){CP=null;cpUpd();m.textContent=data.msg;return}CP={code:data.code,kind:data.kind,value:data.value,min:data.min};cpUpd();m.innerHTML='কুপন প্রয়োগ হয়েছে ✓ <a href="#" data-a="cpclear">বাতিল</a>'}catch(x){m.textContent='কুপন যাচাই করা যায়নি।'}}
-async function loadOffer(){if(!sb)return;try{const{data}=await sb.rpc('offer_active');if(!data)return;OFFER=data;const c=$('#cpn');if(c)c.hidden=!data.active;const a=$('#ann');if(a){if(data.active&&data.banner){a.textContent=data.banner;a.hidden=false}else a.hidden=true}}catch(e){}}
+const ANN_DEF={on:true,speed:4,msgs:['জেনিসিস লাইফস্টাইলে আপনাকে স্বাগতম।']};
+let ANN=ANN_DEF,OFFERB='',annT=0,annI=0;
+function annRender(){const a=$('#ann');if(!a)return;clearTimeout(annT);const m=[];if(OFFERB)m.push(OFFERB);if(ANN.on)ANN.msgs.forEach(x=>m.push(x));
+ if(!m.length){a.hidden=true;return}a.hidden=false;annI=0;a.innerHTML='<span class="ans"></span>';const s=a.firstChild,sp=Math.max(2,Math.min(15,+ANN.speed||4))*1000;
+ const go=()=>{s.style.transition='none';s.classList.remove('out');s.classList.add('pre');s.textContent=m[annI];void s.offsetWidth;s.style.transition='';s.classList.remove('pre');
+  annT=setTimeout(()=>{s.classList.add('out');annT=setTimeout(()=>{annI=(annI+1)%m.length;go()},700)},sp)};go()}
+async function loadAnn(){if(!await wsb())return;try{const{data}=await sb.from('site_settings').select('value').eq('key','announcement').maybeSingle();const v=data&&data.value;if(v&&Array.isArray(v.msgs)){ANN={on:v.on!==false,speed:v.speed||4,msgs:v.msgs.filter(x=>typeof x==='string'&&x.trim()).slice(0,5)};annRender()}}catch(e){}}
+async function loadOffer(){if(!sb)return;try{const{data}=await sb.rpc('offer_active');if(!data)return;OFFER=data;const c=$('#cpn');if(c)c.hidden=!data.active;OFFERB=data.active&&data.banner?data.banner:'';annRender();}catch(e){}}
 async function saveOrderToDB(o){
  if(!sb)return false;
  try{const r=await Promise.race([sb.from('orders').insert({order_number:o.no||null,customer_name:o.nm,phone:o.ph,address:o.fullAddr,items:o.itemsForDb,subtotal:o.sub,delivery_fee:o.f||0,total:o.t,discount:o.disc||0,coupon_code:o.cp||null,notes:o.notes||null}),new Promise((_,j)=>setTimeout(()=>j(new Error('timeout')),15000))]);return !(r&&r.error)}catch(e){return false}
@@ -255,12 +267,12 @@ const V={
 <section class="w sec"><h2>New arrivals</h2><div class="slwrap"><button class="slnav prev" data-a="slprev" aria-label="Previous">‹</button><div class="sl" id="slnew">${mixCat(P.filter(p=>p.nw)).map(card).join('')}</div><button class="slnav next" data-a="slnext" aria-label="Next">›</button></div></section>
 <section class="w sec"><h2>All products</h2>${grid([...P].sort(catSort))}</section>
 ${CFG.promo?`<section class="sof"><div class="w"><h2>${CFG.promo.t}</h2><p>${CFG.promo.x}</p><a class="bt" href="${CFG.promo.l}">${CFG.promo.b}</a></div></section>`:''}
-<section class="sof"><div class="w"><h2>Why shop with Genesis Lifestyle</h2><div class="tr wcard">
-<div class="wc"><span class="wi">${ICO.check}</span><h3>Quality-focused products</h3><p class="mut">Panjabi, shirts, pants, polos and t-shirts chosen for everyday wear.</p></div>
-<div class="wc"><span class="wi">${ICO.store}</span><h3>A real showroom</h3><p class="mut">Try the fit in person at Police Plaza, Bogura.</p></div>
-<div class="wc"><span class="wi">${ICO.truck}</span><h3>Nationwide delivery</h3><p class="mut">Order online from anywhere in Bangladesh.</p></div>
-<div class="wc"><span class="wi">${ICO.chat}</span><h3>Customer support</h3><p class="mut">Ask about sizes and stock on WhatsApp.</p></div>
-<div class="wc"><span class="wi">${ICO.swap}</span><h3>Easy exchange</h3><p class="mut">Subject to store policy.</p></div>
+<section class="sof"><div class="w"><h2>কেন Genesis Lifestyle-এ কিনবেন</h2><div class="tr wcard">
+<div class="wc"><span class="wi">${ICO.check}</span><h3>বাছাই করা পোশাক</h3><p class="mut">পাঞ্জাবি, শার্ট, পোলো, টি-শার্ট ও প্যান্ট, প্রতিদিন ও অনুষ্ঠানে পরার মতো করে বাছাই করা।</p></div>
+<div class="wc"><span class="wi">${ICO.store}</span><h3>বগুড়ায় আমাদের শোরুম</h3><p class="mut">পুলিশ প্লাজায় এসে নিজে পরে দেখে নিতে পারেন। সকাল ১১টা থেকে রাত ৮টা, শুক্রবার বন্ধ।</p></div>
+<div class="wc"><span class="wi">${ICO.truck}</span><h3>সারা দেশে ডেলিভারি</h3><p class="mut">Steadfast কুরিয়ারে সাধারণত ২-৪ দিনে। ক্যাশ অন ডেলিভারি বা বিকাশে পেমেন্ট।</p></div>
+<div class="wc"><span class="wi">${ICO.chat}</span><h3>WhatsApp-এ সহায়তা</h3><p class="mut">সাইজ, স্টক বা অর্ডার নিয়ে যেকোনো প্রশ্ন সরাসরি জিজ্ঞেস করুন।</p></div>
+<div class="wc"><span class="wi">${ICO.swap}</span><h3>সহজ এক্সচেঞ্জ</h3><p class="mut">সাইজ সমস্যা হলে পণ্য পাওয়ার ২৪ ঘণ্টার মধ্যে ছবি ও ভিডিওসহ জানান। <a href="#/returns">নিয়ম দেখুন</a></p></div>
 </div></div></section>
 <section class="w"><h2>Visit our showroom</h2><p>Genesis Lifestyle<br>${ADDR.replace(/, /g,'<br>')}</p><p class="mut">Showroom hours: 11 AM – 8 PM. Closed on Fridays.</p><div class="row"><a class="bt" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Police+Plaza+Bogura">Get directions</a><a class="bt o" href="#/contact">Contact</a><a class="bt o wl" href="#">WhatsApp</a></div></section>`],
 shop:q=>{const c=q.get('cat')||'all',s=(q.get('q')||'').toLowerCase(),o=q.get('sort')||'new',fp=q.get('pr')||'',fz=q.get('sz')||'',fc=q.get('col')||'';let l=P.filter(p=>(c==='all'||(c==='new'?p.nw:p.c===c))&&(!s||(p.n+p.c+p.id).toLowerCase().includes(s)));
@@ -280,12 +292,14 @@ product:id=>{const p=P.find(x=>x.id===id);if(!p)return['Not found',`<section cla
  const msg=wa(`Hello Genesis Lifestyle, I want to ask about ${p.n} (${p.id}).${noSize?'':' Size: '+(sel.s||'not chosen')+'.'} Color: ${sel.c}. ${location.href}`);
  const stN=z=>p.stock&&p.stock[z]!==undefined?(+p.stock[z]||0):null,totSt=(noSize?['Free']:pSz).reduce((a,z)=>a+(stN(z)||0),0),haveSt=p.stock&&Object.keys(p.stock).length>0;
  const lowStk=!SHOW_LOW_STOCK||outOfStock||!haveSt?'':(sel.s&&sel.s!=='Free'&&stN(sel.s)===1?'<p class="lowst">এই সাইজের মাত্র ১ পিস বাকি আছে</p>':(totSt>0&&totSt<=3?`<p class="lowst">দ্রুত শেষ হচ্ছে — মাত্র ${totSt} পিস বাকি</p>`:''));
+ const shUrl='https://genesislifestylebd.com/#/product/'+id;
  const gi=sel.gi||0,gal=p.imgs?`<div class="ph"><img src="${p.imgs[gi]}" alt="${p.n}" loading="lazy"></div><div class="gal">${p.imgs.map((im,n)=>`<button class="th${n===gi?' on':''}" data-a="gimg" data-i="${n}"><img src="${im}" alt=""></button>`).join('')}</div>`:tile(p,sel.c);
  return[p.n+' | Genesis Lifestyle',`<section class="w pd"><div>${gal}</div><div><h1>${p.n}</h1><p class="mut">Code: ${p.id}</p>${price(p)}${lowStk}<p>${p.desc||''}</p>
 ${noSize?'':`<h3>Size</h3><div class="opt">${pSz.map(z=>availSz.includes(z)?`<button data-a="size" data-v="${z}" aria-pressed="${sel.s===z}">${z}</button>`:`<button disabled aria-disabled="true" title="Out of stock" class="oos">${z}</button>`).join('')}</div>${outOfStock?'<p class="mut">এই মুহূর্তে স্টকে নেই।</p>':(availSz.length<pSz.length?'<p class="mut" style="font-size:.85rem">কাটা সাইজগুলো এখন স্টকে নেই।</p>':'')}<p><a href="#/size">Size guide</a></p>`}
 <h3>Color: ${sel.c}</h3><div class="opt">${p.cols.map(c=>`<button data-a="col" data-v="${c}" aria-pressed="${sel.c===c}">${c}</button>`).join('')}</div>
 <h3 style="margin-top:1rem">Quantity</h3><div class="qt"><button data-a="q-" aria-label="Decrease">−</button><span>${sel.q}</span><button data-a="q+" aria-label="Increase">+</button></div>
 <p class="er" id="er" role="alert"></p><div class="row" style="margin-top:0">${outOfStock?'<button class="bt" disabled>স্টক শেষ</button>':`<button class="bt" data-a="add" data-id="${id}">Add to cart</button><button class="bt o" data-a="buy" data-id="${id}">Buy now</button>`}<a class="bt o" target="_blank" rel="noopener" href="${msg}">WhatsApp inquiry</a></div>
+<div class="shr"><span>শেয়ার করুন</span><a target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent('Genesis Lifestyle: '+p.n+' - '+M(p.p)+'\n'+shUrl)}">WhatsApp</a><a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shUrl)}">Facebook</a>${/Android|iPhone|iPad/i.test(navigator.userAgent)?`<a href="fb-messenger://share/?link=${encodeURIComponent(shUrl)}">Messenger</a>`:''}<button type="button" data-a="cpl" data-v="${shUrl}">লিংক কপি</button></div>
 <details><summary>Product details</summary><p>Code: ${p.id}<br>Category: ${p.c}<br>${noSize?'':'Sizes: '+pSz.join(', ')+'<br>'}Colour: ${p.cols.join(', ')}</p></details><details><summary>Care instructions</summary><p>${(CARE[p.c]||CARE._).map(x=>'• '+x).join('<br>')}</p></details><details><summary>Delivery</summary><p>ক্যাশ অন ডেলিভারি বা বিকাশ পেমেন্ট। বগুড়ায় ${M(CFG.delivery.inside)}, বাইরে ${M(CFG.delivery.outside)}, সাধারণত ২-৪ দিনে। <a href="#/delivery">বিস্তারিত</a></p></details><details><summary>Exchange</summary><p>সাইজ সমস্যা বা অপছন্দ হলে পণ্য পাওয়ার ২৪ ঘণ্টার মধ্যে ছবি ও ভিডিওসহ WhatsApp-এ জানান। <a href="#/returns">বিস্তারিত নিয়ম</a></p></details></div></section><section class="w sec"><h2>You may also like</h2>${grid(rel)}</section>`]},
 cart:()=>['Cart | Genesis Lifestyle',`<section class="w"><h1>Your cart</h1>${cart.length?cart.map((i,n)=>{const p=P.find(x=>x.id===i.id);return`<div class="ci">${tile(p,i.c)}<div><a href="#/product/${p.id}"><b>${p.n}</b></a><br><span class="mut">${i.s&&i.s!=='Free'?'Size '+i.s+' · ':''}${i.c}</span><br>${M(p.p)}</div><div><div class="qt"><button data-a="cq-" data-n="${n}" aria-label="Decrease">−</button><span>${i.q}</span><button data-a="cq+" data-n="${n}" aria-label="Increase">+</button></div><br><button class="tb" data-a="rm" data-n="${n}">Remove</button></div></div>`}).join('')+`<div class="sm"><p><span>Subtotal</span><b>${M(tot().sub)}</b></p><p><span>Delivery</span><span>জেলা অনুযায়ী চেকআউটে যোগ হবে</span></p></div><div class="row"><a class="bt o" href="#/shop">Continue shopping</a><a class="bt" href="#/checkout">Proceed to checkout</a></div>`:`<p>Your cart is empty.</p><a class="bt" href="#/shop">Start shopping</a>`}</section>`],
 checkout:()=>!cart.length?V.cart():['Checkout | Genesis Lifestyle',`<section class="w two"><form id="ck" novalidate><h1>Checkout</h1>
@@ -303,6 +317,19 @@ ${ok?`<div class="od-c"><div class="od-sh2"><h2>Order status</h2><span id="odchi
 <div class="od-c"><h2>Delivery address</h2><p style="margin:0"><b>${esc(o.nm)}</b><br>${esc(o.ph)}<br>${esc(o.ad)}, ${esc(o.ar)}, ${esc(o.di)}</p></div>
 <div class="od-c od-help"><h2>Need help with your order?</h2><p class="mut">অর্ডার নম্বর <b>${esc(o.no)}</b> জানিয়ে আমাদের সাথে যোগাযোগ করুন।</p><div class="od-hb"><a class="bt o" href="tel:+8801608669888">Call 01608669888</a><a class="bt o" target="_blank" rel="noopener" href="${wa('অর্ডার '+o.no+' সম্পর্কে জানতে চাই।')}">Chat on WhatsApp</a></div></div>
 <a class="bt od-sh" href="#/shop">Continue shopping</a></section>`]},
+nf:()=>['পেজ পাওয়া যায়নি | Genesis Lifestyle',`<section class="w" style="text-align:center;padding:3rem 0"><p class="mut" style="font-size:3rem;margin:0">404</p><h1>পেজটি খুঁজে পাওয়া যায়নি</h1><p class="mut">লিংকটি ভুল হতে পারে বা পেজটি সরিয়ে ফেলা হয়েছে।</p><div class="row" style="justify-content:center;margin-top:1.5rem"><a class="bt" href="#/shop">সব প্রোডাক্ট দেখুন</a><a class="bt o" href="#/">হোম পেজ</a><a class="bt o wl" href="#">WhatsApp-এ জানান</a></div></section>`],
+faq:()=>{const Q=[
+['কীভাবে অর্ডার করব?','পছন্দের প্রোডাক্টে ঢুকে সাইজ ও রং বেছে Add to cart বা Buy now চাপুন। চেকআউটে আপনার নাম, মোবাইল নম্বর ও ঠিকানা দিলেই অর্ডার হয়ে যায়। কোনো অ্যাকাউন্ট খুলতে বা সাইনআপ করতে হয় না।'],
+['পেমেন্ট কীভাবে করব?','ক্যাশ অন ডেলিভারি: পণ্য হাতে পেয়ে কুরিয়ারকে টাকা দিন। চাইলে চেকআউটে বিকাশ QR স্ক্যান করে আগেই পেমেন্ট করতে পারেন, তখন TrxID লিখে দিতে হবে।'],
+['ডেলিভারি চার্জ কত?',`বগুড়ার ভেতরে ${M(CFG.delivery.inside)} এবং বগুড়ার বাইরে ${M(CFG.delivery.outside)}। জেলা বাছলে চেকআউটে নিজে থেকে যোগ হয়।`],
+['কত দিনে পণ্য পাব?','অর্ডার নিশ্চিত হওয়ার পর সাধারণত ২ থেকে ৪ দিনের মধ্যে Steadfast কুরিয়ারে পৌঁছায়।'],
+['অর্ডার নিশ্চিত হবে কীভাবে?','অর্ডারের পর আমরা আপনার দেওয়া নম্বরে ফোন করে অর্ডার ও ঠিকানা নিশ্চিত করি। তাই সঠিক মোবাইল নম্বর দেবেন।'],
+['অর্ডারের অবস্থা কীভাবে দেখব?','<a href="#/track">Track order</a> পেজে শুধু মোবাইল নম্বর দিলেই আপনার অর্ডার, তার অবস্থা ও বিস্তারিত দেখতে পাবেন।'],
+['সাইজ না মিললে কী করব?','পণ্য হাতে পাওয়ার ২৪ ঘণ্টার মধ্যে ছবি ও ভিডিওসহ WhatsApp-এ জানান। পণ্য না পরা ও ট্যাগসহ থাকলে একই দামের অন্য সাইজ বা পণ্যের সাথে বদলে নেওয়া যাবে। টাকা ফেরত দেওয়া হয় না। <a href="#/returns">পুরো নিয়ম দেখুন</a>।'],
+['ভুল বা ত্রুটিপূর্ণ পণ্য পেলে?','আমরা পণ্য বদলে দেব এবং কুরিয়ার চার্জ বহন করব। ছবি ও ভিডিওসহ WhatsApp-এ জানান।'],
+['শোরুমে গিয়ে কেনা যাবে?',`অবশ্যই। ঠিকানা: ${ADDR}। সময়: সকাল ১১টা থেকে রাত ৮টা, শুক্রবার বন্ধ।`],
+['সাইজ বা স্টক নিয়ে প্রশ্ন থাকলে?','WhatsApp-এ প্রোডাক্টের নাম বা কোড দিয়ে জিজ্ঞেস করুন, আমরা জানিয়ে দেব।']];
+return['FAQ | Genesis Lifestyle',`<section class="w"><h1>সচরাচর জিজ্ঞাসা</h1><p class="mut">অর্ডার, ডেলিভারি ও এক্সচেঞ্জ নিয়ে সাধারণ প্রশ্নের উত্তর।</p>${Q.map(x=>`<details><summary>${x[0]}</summary><p>${x[1]}</p></details>`).join('')}<div class="row" style="margin-top:1.5rem"><a class="bt o wl" href="#">উত্তর না পেলে WhatsApp করুন</a></div></section>`]},
 track:()=>['Track order | Genesis Lifestyle',`<section class="w od"><h1 style="text-align:center;font-size:clamp(1.6rem,6vw,2.2rem)">Track your order</h1><p class="mut" style="text-align:center;margin:0 0 1.2rem">অর্ডারের সময় যে মোবাইল নম্বর দিয়েছিলেন সেটা লিখুন। আপনার সর্বশেষ অর্ডারগুলোর অবস্থা এখানে দেখা যাবে।</p><form id="tk" class="od-c" novalidate><label for="tkp" style="margin-top:0">Mobile number</label><input id="tkp" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel"><p class="er" id="er" role="alert"></p><button class="bt" style="width:100%">Check status</button></form><div id="tkr"></div></section>`],
 saved:()=>['Saved items | Genesis Lifestyle',`<section class="w"><h1>Saved items</h1>${(()=>{const l=P.filter(p=>wish.includes(p.id));return l.length?grid(l):'<p class="mut">আপনি এখনো কিছু সেভ করেননি। পছন্দের পণ্যের ♡ চাপুন, এখানে জমা থাকবে।</p><a class="bt" href="#/shop">Shop now</a>'})()}</section>`],
 size:()=>['Size guide | Genesis Lifestyle',`<section class="w"><h1>Size guide</h1><p class="mut">প্রতিটি সাইজের মাপ শিগগিরই এখানে যোগ করা হবে। সাইজ নিয়ে সন্দেহ থাকলে WhatsApp-এ জিজ্ঞেস করুন।</p><p><a class="bt" href="${wa('Size guide: আমি সাইজ সম্পর্কে জানতে চাই।')}" target="_blank" rel="noopener">WhatsApp-এ জিজ্ঞেস করুন</a></p></section>`],
@@ -318,10 +345,10 @@ function atc(id){const pp=P.find(x=>x.id===id);if(pp)px('AddToCart',{content_ids
 function px(ev,pr){try{if(window.fbq)pr?fbq('track',ev,pr):fbq('track',ev)}catch(e){}}
 function route(keep,forceHash){const raw=forceHash!==undefined?forceHash:location.hash;const[h,qs]=(raw.slice(2)||'').split('?'),[r,a]=h.split('/'),q=new URLSearchParams(qs||''),sq=q.get('q');
  if(r==='product'&&sel.id!==a)sel={id:a};let t,html;
- if(V[r])[t,html]=V[r](r==='shop'?q:a);else if(PG[r]){t=PG[r][0]+' | Genesis Lifestyle';html=`<section class="w"><h1>${PG[r][0]}</h1>${PG[r][1].map(([x,y])=>`<h2>${x}</h2><p>${mk(y)}</p>`).join('')}</section>`}else[t,html]=V[''](); 
+ if(V[r])[t,html]=V[r](r==='shop'?q:a);else if(PG[r]){t=PG[r][0]+' | Genesis Lifestyle';html=`<section class="w"><h1>${PG[r][0]}</h1>${PG[r][1].map(([x,y])=>`<h2>${x}</h2><p>${mk(y)}</p>`).join('')}</section>`}else if(r&&raw.startsWith('#/'))[t,html]=V.nf();else[t,html]=V[''](); 
  document.title=t;$('#main').innerHTML=html;if(!keep&&(raw||'#/')!==window.__lpx){window.__lpx=raw||'#/';px('PageView');if(r==='product'){const pp=P.find(x=>x.id===a);if(pp)px('ViewContent',{content_ids:[pp.id],content_name:pp.n,content_type:'product',value:pp.p,currency:'BDT'})}if(r==='checkout'&&cart.length)px('InitiateCheckout',{value:tot().net,currency:'BDT',num_items:cart.reduce((x,i)=>x+i.q,0),content_type:'product',content_ids:cart.map(i=>i.id)})}heroInit();if(r==='track')trkInit();if(r==='done')doneLive();const so=$('#so');if(so)so.value=q.get('sort')||'new';if(!keep)window.scrollTo(0,0);$('#dr').hidden=true;
  $('#dn').innerHTML=`<a href="#/">Home</a><div class="dd"><button class="tb" data-a="ddtoggle" aria-expanded="false">Categories ▾</button><div class="ddm" hidden>${SHOPNAV.map(n=>`<a href="${n[1]}">${n[0]}</a>`).join('')}</div></div><form id="sf2" class="dsf" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="sq2" type="search" placeholder="Search products" aria-label="Search products"></form><a href="#/track">Track order</a><a href="#/contact">Contact</a><a href="#/about">About</a>`;
- $('#dm').innerHTML='<button class="tb" data-a="menu">Close</button><a href="#/">Home</a><span class="mut" style="padding:.6rem 0 0;font-weight:500">Categories</span>'+SHOPNAV.map(n=>`<a class="sub" href="${n[1]}">${n[0]}</a>`).join('')+'<a href="#/track">Track order</a><a href="#/about">About</a><a href="#/contact">Contact</a>'
+ $('#dm').innerHTML='<button class="tb" data-a="menu">Close</button><a href="#/">Home</a><span class="mut" style="padding:.6rem 0 0;font-weight:500">Categories</span>'+SHOPNAV.map(n=>`<a class="sub" href="${n[1]}">${n[0]}</a>`).join('')+'<a href="#/track">Track order</a><a href="#/faq">FAQ</a><a href="#/about">About</a><a href="#/contact">Contact</a>'
  try{if(location.hash!==raw)location.hash=raw}catch(e){}}
 function goTo(h){try{location.hash=h}catch(e){}route(false,h)}
 function add(id){if(!sel.s){const er=$('#er');if(er){er.textContent='আগে সাইজ বেছে নিন।';try{er.scrollIntoView()}catch(e){}}return false}const p=P.find(x=>x.id===id);if(p&&p.stock&&p.stock[sel.s]!==undefined&&!(p.stock[sel.s]>0)){const er=$('#er');if(er){er.textContent='এই সাইজ স্টকে নেই।';try{er.scrollIntoView()}catch(e){}}return false}const k=cart.find(i=>i.id===id&&i.s===sel.s&&i.c===sel.c);k?k.q+=sel.q:cart.push({id,s:sel.s,c:sel.c,q:sel.q});save();return true}
@@ -329,7 +356,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
  if(a==='menu')$('#dr').hidden=!$('#dr').hidden;
  else if(a==='ddtoggle'){const m=b.nextElementSibling,open=m.hidden;document.querySelectorAll('.ddm').forEach(x=>x.hidden=true);document.querySelectorAll('.dd>.tb').forEach(x=>x.setAttribute('aria-expanded','false'));if(open){m.hidden=false;b.setAttribute('aria-expanded','true')}}
  else if(a==='search'){$('#sf').hidden=!$('#sf').hidden;$('#sq').focus()}
- else if(a==='cpno'){const t=d.v;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy',2000)},()=>{b.textContent='Copy'})}
+ else if(a==='cpl'){const t=d.v;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{b.textContent='কপি হয়েছে ✓';setTimeout(()=>b.textContent='লিংক কপি',2000)},()=>{try{prompt('লিংক কপি করুন:',t)}catch(e){}})}else if(a==='cpno'){const t=d.v;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy',2000)},()=>{b.textContent='Copy'})}
  else if(a==='wish'){wish=wish.includes(d.id)?wish.filter(x=>x!==d.id):[...wish,d.id];save();route(true)}
  else if(a==='size'){sel.s=d.v;route(true)}else if(a==='col'){sel.c=d.v;route(true)}
  else if(a==='fclr'){goTo(shopUrl(($('#so')||{}).value,'','',''))}else if(a==='gimg'){sel.gi=+d.i;route(true)}
@@ -385,7 +412,7 @@ function toast(t){let e=document.getElementById('tst');if(!e){e=document.createE
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#/"]');if(!a)return;const norm=h=>(h||'').replace(/^#\/?/,'');if(norm(a.getAttribute('href'))===norm(location.hash)){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'})}});
 document.addEventListener('click',e=>{const x=e.target.closest('[data-soon]');if(x){e.preventDefault();toast(x.dataset.soon+' পেজ এখনো চালু হয়নি, শীঘ্রই আসছে। এখন Facebook বা WhatsApp-এ যোগাযোগ করুন।')}});
 document.querySelectorAll('.wl').forEach(a=>a.href=wa('Hello Genesis Lifestyle'));$('#soc').innerHTML=socHTML();$('#yr').textContent=new Date().getFullYear();
-addEventListener('hashchange',()=>route());save();route();loadProductsFromDB();loadOffer();
+addEventListener('hashchange',()=>route());save();route();annRender();loadProductsFromDB();loadOffer();loadAnn();
 </script>
 </body>
 </html>
