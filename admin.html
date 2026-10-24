@@ -203,12 +203,12 @@
     <div id="tab-banner" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">সাইটের উপরের ঘোষণা বার</h3>
-        <p class="small">সাইটের একদম উপরের সরু বারে এই লেখা ডান দিক থেকে এসে বাঁ দিকে চলে যাবে, তারপর আবার আসবে। একাধিক লাইন দিলে একটার পর একটা আসবে। অফার চালু থাকলে অফারের ব্যানার সবার আগে দেখাবে।</p>
+        <p class="small">সাইটের একদম উপরের সরু বারে এই লেখা থামা ছাড়া ডান দিক থেকে বাঁ দিকে সারাক্ষণ চলতে থাকবে। একাধিক লাইন দিলে সব লাইন একটার পর একটা (◆ চিহ্ন দিয়ে আলাদা) ঘুরবে। অফার চালু থাকলে অফারের ব্যানার সবার আগে দেখাবে।</p>
         <label style="display:flex;gap:.6rem;align-items:center;margin:.6rem 0"><input type="checkbox" id="bn_on" style="width:auto"> ঘোষণা বার চালু (ON)</label>
         <label>ঘোষণার লেখা (প্রতি লাইনে একটা, সর্বোচ্চ ৫টি, ছোট রাখুন)</label>
         <textarea id="bn_msgs" rows="5" maxlength="500" placeholder="জেনিসিস লাইফস্টাইলে আপনাকে স্বাগতম।"></textarea>
-        <label>লেখাটা মাঝখানে কত সেকেন্ড থাকবে</label>
-        <select id="bn_speed"><option value="3">৩ সেকেন্ড</option><option value="4">৪ সেকেন্ড</option><option value="5">৫ সেকেন্ড</option><option value="7">৭ সেকেন্ড</option></select>
+        <label>চলার গতি</label>
+        <select id="bn_speed"><option value="1">ধীর</option><option value="2">মাঝারি</option><option value="3">দ্রুত</option></select>
         <button class="primary" id="bn_save" style="margin-top:.8rem">সেভ করুন</button>
         <span class="msg" id="bn_msg"></span>
       </div>
@@ -648,7 +648,7 @@ document.getElementById('of_save').addEventListener('click', async () => {
 });
 
 // ---------- ANNOUNCEMENT BAR ----------
-const BN_DEF = { on: true, speed: 4, msgs: ['জেনিসিস লাইফস্টাইলে আপনাকে স্বাগতম।'] };
+const BN_DEF = { on: true, speed: 2, msgs: ['জেনিসিস লাইফস্টাইলে আপনাকে স্বাগতম।'] };
 async function loadBanner(){
   const msg = document.getElementById('bn_msg'); msg.className = 'msg';
   let v = BN_DEF;
@@ -657,7 +657,7 @@ async function loadBanner(){
   else if(data && data.value && Array.isArray(data.value.msgs)) v = data.value;
   document.getElementById('bn_on').checked = v.on !== false;
   document.getElementById('bn_msgs').value = (v.msgs || []).join('\n');
-  document.getElementById('bn_speed').value = String(v.speed || 4);
+  document.getElementById('bn_speed').value = [1,2,3].includes(+v.speed) ? String(+v.speed) : '2';
 }
 document.getElementById('bn_save').addEventListener('click', async () => {
   const msg = document.getElementById('bn_msg'); msg.className = 'msg';
@@ -666,7 +666,7 @@ document.getElementById('bn_save').addEventListener('click', async () => {
   if(msgs.some(x => x.length > 90)){ msg.textContent = 'প্রতিটি লাইন ৯০ অক্ষরের মধ্যে রাখুন।'; return; }
   const on = document.getElementById('bn_on').checked;
   if(on && !msgs.length){ msg.textContent = 'চালু রাখলে অন্তত একটি লেখা দিন।'; return; }
-  const value = { on, speed: parseInt(document.getElementById('bn_speed').value, 10) || 4, msgs };
+  const value = { on, speed: parseInt(document.getElementById('bn_speed').value, 10) || 2, msgs };
   const { error } = await sb.from('site_settings').upsert({ key: 'announcement', value, updated_at: new Date().toISOString() });
   if(error){ msg.textContent = 'Error: ' + error.message; return; }
   msg.textContent = 'সেভ হয়েছে ✓ (সাইটে রিফ্রেশ দিলে দেখা যাবে)';

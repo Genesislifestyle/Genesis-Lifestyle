@@ -86,7 +86,7 @@ label{display:block;font-weight:500;margin:.9rem 0 .25rem}.er{color:#C0392B;font
 table{width:100%;border-collapse:collapse;margin:.5rem 0 1.5rem}td,th{border:1px solid var(--line);padding:.5rem;text-align:left}
 .ci{display:grid;grid-template-columns:72px 1fr auto;gap:.8rem;padding:1rem 0;border-bottom:1px solid var(--line);align-items:center}.ci .ph{aspect-ratio:1}.ci .ph span{display:none}
 .qt{display:inline-flex;align-items:center;border:1px solid var(--line)}.qt button{width:40px;height:40px;background:none;border:0;color:inherit;font-size:1.2rem;cursor:pointer}.qt span{min-width:2rem;text-align:center}
-.ann{background:var(--acc);color:var(--on);text-align:center;padding:.45rem 1rem;font-size:.9rem;font-weight:500;min-height:2.4rem;display:flex;align-items:center;justify-content:center;overflow:hidden}.ann .ans{display:inline-block;transition:transform .65s ease,opacity .65s ease}.ann .ans.out{opacity:0;transform:translateX(-110%)}.ann .ans.pre{opacity:0;transform:translateX(110%)}@media (prefers-reduced-motion:reduce){.ann .ans{transition:none}}.ann[hidden]{display:none!important}
+.ann{background:var(--acc);color:var(--on);text-align:center;padding:.45rem 0;font-size:.9rem;font-weight:500;min-height:2.4rem;display:flex;align-items:center;overflow:hidden}.ann .ans{margin:0 auto;padding:0 1rem}.ann .mq{display:flex;align-items:center;width:max-content;white-space:nowrap;animation:annmq var(--d,20s) linear infinite;will-change:transform}.ann .mq span{padding:0 1.1rem}.ann .mq i{font-style:normal;opacity:.6;font-size:.6rem}@keyframes annmq{to{transform:translateX(-50%)}}.ann[hidden]{display:none!important}
 .cpn{margin:.4rem 0 .6rem}.cpn[hidden]{display:none!important}.cpn label{font-size:.9rem;display:block;margin-bottom:.25rem}.cpr{display:flex;gap:.5rem}.cpr input{flex:1;min-width:0;text-transform:uppercase}.cpr .bt{padding:.5rem 1rem;min-height:44px}.cpm{display:block;margin-top:.25rem;color:var(--mut)}.cpm a{text-decoration:underline}
 .sm{background:var(--soft);padding:1rem;border-radius:4px}.sm p{display:flex;justify-content:space-between;margin:.3rem 0}
 .od{max-width:640px}
@@ -215,13 +215,18 @@ async function loadProductsFromDB(){
 }
 function cpUpd(){const d=($('#di')||{value:''}).value.trim(),t=tot(d);if(!$('#tt'))return;const dv=$('#dv'),ds=$('#dsr');if(ds){ds.hidden=!t.disc;dv.textContent='-'+M(t.disc)}$('#tt').textContent=M(d?t.t:t.net);if($('#pay'))$('#pay').textContent=M(d?t.t:t.net)}
 async function cpApply(){const code=($('#cpi').value||'').trim(),m=$('#cpm');if(!code){m.textContent='কুপন কোড লিখুন।';return}if(!sb){m.textContent='এখন কুপন যাচাই করা যাচ্ছে না।';return}m.textContent='যাচাই হচ্ছে...';try{const{data,error}=await sb.rpc('check_coupon',{p_code:code,p_sub:tot().sub});if(error||!data){m.textContent='কুপন যাচাই করা যায়নি, আবার চেষ্টা করুন।';return}if(!data.ok){CP=null;cpUpd();m.textContent=data.msg;return}CP={code:data.code,kind:data.kind,value:data.value,min:data.min};cpUpd();m.innerHTML='কুপন প্রয়োগ হয়েছে ✓ <a href="#" data-a="cpclear">বাতিল</a>'}catch(x){m.textContent='কুপন যাচাই করা যায়নি।'}}
-const ANN_DEF={on:true,speed:4,msgs:['জেনিসিস লাইফস্টাইলে আপনাকে স্বাগতম।']};
-let ANN=ANN_DEF,OFFERB='',annT=0,annI=0;
-function annRender(){const a=$('#ann');if(!a)return;clearTimeout(annT);const m=[];if(OFFERB)m.push(OFFERB);if(ANN.on)ANN.msgs.forEach(x=>m.push(x));
- if(!m.length){a.hidden=true;return}a.hidden=false;annI=0;a.innerHTML='<span class="ans"></span>';const s=a.firstChild,sp=Math.max(2,Math.min(15,+ANN.speed||4))*1000;
- const go=()=>{s.style.transition='none';s.classList.remove('out');s.classList.add('pre');s.textContent=m[annI];void s.offsetWidth;s.style.transition='';s.classList.remove('pre');
-  annT=setTimeout(()=>{s.classList.add('out');annT=setTimeout(()=>{annI=(annI+1)%m.length;go()},700)},sp)};go()}
-async function loadAnn(){if(!await wsb())return;try{const{data}=await sb.from('site_settings').select('value').eq('key','announcement').maybeSingle();const v=data&&data.value;if(v&&Array.isArray(v.msgs)){ANN={on:v.on!==false,speed:v.speed||4,msgs:v.msgs.filter(x=>typeof x==='string'&&x.trim()).slice(0,5)};annRender()}}catch(e){}}
+const ANN_DEF={on:true,speed:2,msgs:['জেনিসিস লাইফস্টাইলে আপনাকে স্বাগতম।']};
+let ANN=ANN_DEF,OFFERB='';
+function annRender(){const a=$('#ann');if(!a)return;const m=[];if(OFFERB)m.push(OFFERB);if(ANN.on)ANN.msgs.forEach(x=>m.push(x));
+ if(!m.length){a.hidden=true;return}a.hidden=false;a.textContent='';
+ if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){const s=document.createElement('span');s.className='ans';s.textContent=m[0];a.appendChild(s);return}
+ const tr=document.createElement('div');tr.className='mq';a.appendChild(tr);
+ const mk=()=>{const f=document.createDocumentFragment();m.forEach(x=>{const s=document.createElement('span');s.textContent=x;f.appendChild(s);const d=document.createElement('i');d.textContent='◆';d.setAttribute('aria-hidden','true');f.appendChild(d)});return f};
+ const build=()=>{tr.style.animation='none';tr.textContent='';tr.appendChild(mk());let w=tr.getBoundingClientRect().width,n=1;const cw=a.clientWidth;while(w<cw&&n<40){tr.appendChild(mk());n++;w=tr.getBoundingClientRect().width}
+  [...tr.childNodes].map(c=>c.cloneNode(true)).forEach(c=>tr.appendChild(c));const pps={1:45,2:70,3:100}[ANN.speed]||70;tr.style.setProperty('--d',(w/pps).toFixed(1)+'s');void tr.offsetWidth;tr.style.animation='';annW=a.clientWidth};
+ build();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(build)}
+let annW=0;addEventListener('resize',()=>{clearTimeout(window._ar);window._ar=setTimeout(()=>{const a=$('#ann');if(a&&a.clientWidth!==annW)annRender()},300)});
+async function loadAnn(){if(!await wsb())return;try{const{data}=await sb.from('site_settings').select('value').eq('key','announcement').maybeSingle();const v=data&&data.value;if(v&&Array.isArray(v.msgs)){ANN={on:v.on!==false,speed:v.speed||2,msgs:v.msgs.filter(x=>typeof x==='string'&&x.trim()).slice(0,5)};annRender()}}catch(e){}}
 async function loadOffer(){if(!sb)return;try{const{data}=await sb.rpc('offer_active');if(!data)return;OFFER=data;const c=$('#cpn');if(c)c.hidden=!data.active;OFFERB=data.active&&data.banner?data.banner:'';annRender();}catch(e){}}
 async function saveOrderToDB(o){
  if(!sb)return false;
