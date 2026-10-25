@@ -15,6 +15,7 @@
   .tabs{display:flex;gap:.5rem;margin-bottom:1.2rem}
   .tab{padding:.5rem 1rem;border-radius:6px;border:1px solid var(--line);cursor:pointer;background:var(--panel);color:var(--ink)}
   .tab.active{background:var(--gold);color:#14120F;border-color:var(--gold)}
+  .rvg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}.rvc{border:1px solid var(--line);border-radius:8px;padding:.5rem;background:var(--panel)}.rvc img{width:100%;height:200px;object-fit:contain;background:#00000014;border-radius:6px}.rvc.off img{opacity:.35}.rvb{display:flex;gap:.4rem;margin-top:.4rem}.rvb button{flex:1;padding:.35rem .2rem;font-size:.8rem}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:1rem;margin-bottom:1rem}
   label{display:block;font-size:.8rem;opacity:.8;margin-top:.7rem}
   input,select,textarea{width:100%;padding:.55rem;margin-top:.25rem;border-radius:6px;border:1px solid #444;background:#111;color:#fff;box-sizing:border-box;font-family:inherit}
@@ -109,6 +110,7 @@
       <div class="tab" data-tab="orders">Orders</div>
       <div class="tab" data-tab="offers">Offers</div>
       <div class="tab" data-tab="banner">ঘোষণা বার</div>
+      <div class="tab" data-tab="reviews">রিভিউ</div>
     </div>
 
     <div id="tab-dash">
@@ -158,6 +160,8 @@
         <input id="p_colors" placeholder="Black, Navy">
         <label id="p_stock_label">প্রতি সাইজে কত পিস স্টকে আছে (০ দিলে সেই সাইজ সাইটে দেখাবে না)</label>
         <div class="stockrow" id="p_stockrow"></div>
+        <label>সাইটে দেখাবেন? (OFF করলে প্রোডাক্ট সাইটে লুকানো থাকবে, ডিলিট হবে না)</label>
+        <select id="p_active"><option value="true">ON — দেখা যাবে</option><option value="false">OFF — লুকানো থাকবে</option></select>
         <label>New arrival? (shows in homepage "New arrivals" row)</label>
         <select id="p_new"><option value="false">No</option><option value="true">Yes</option></select>
         <label>Product images — একসাথে একাধিক বাছতে পারেন। ◀ ▶ দিয়ে ক্রম বদলান, ✕ দিয়ে মুছুন, প্রথম ছবিটাই Cover। <b>Save product</b> চাপলে তবেই বদলাবে।</label>
@@ -171,7 +175,7 @@
       <div class="card">
         <h3 style="margin-top:0">All products</h3>
         <div class="tscroll"><table>
-          <thead><tr><th>Img</th><th>Code</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>New?</th><th></th></tr></thead>
+          <thead><tr><th>Img</th><th>Code</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>New?</th><th>সাইটে</th><th></th></tr></thead>
           <tbody id="productsBody"></tbody>
         </table></div>
       </div>
@@ -214,6 +218,19 @@
       </div>
     </div>
 
+    <div id="tab-reviews" class="hidden">
+      <div class="card">
+        <h3 style="margin-top:0">কাস্টমার রিভিউ (স্ক্রিনশট স্লাইডশো)</h3>
+        <p class="small">কাস্টমারের আসল রিভিউয়ের স্ক্রিনশট আপলোড করুন (কাস্টমারের অনুমতি নিয়ে, ফোন নম্বর ঢেকে)। সেগুলো হোম পেজে স্লাইডশো হিসাবে নিজে নিজে ঘুরবে। কোনো ছবি চালু না থাকলে পুরো সেকশন সাইটে দেখাবে না।</p>
+        <label style="display:flex;gap:.6rem;align-items:center;margin:.6rem 0"><input type="checkbox" id="rv_on" style="width:auto"> রিভিউ সেকশন সাইটে চালু (ON)</label>
+        <label>স্ক্রিনশট বাছুন (একসাথে একাধিক)</label>
+        <input type="file" id="rv_files" accept="image/*" multiple>
+        <button class="primary" id="rv_add" style="margin-top:.8rem">আপলোড করুন</button>
+        <span class="msg" id="rv_msg"></span>
+      </div>
+      <div class="card"><h3 style="margin-top:0">আপলোড করা স্ক্রিনশট</h3><div id="rv_list" class="rvg">কোনো ছবি নেই।</div></div>
+    </div>
+
     <div id="tab-orders" class="hidden">
       <div class="card">
         <h3 style="margin-top:0">Orders</h3>
@@ -245,6 +262,7 @@ async function checkSession(){
     loadOrders();
     loadOffers();
     loadBanner();
+    loadReviews();
   } else {
     loginScreen.classList.remove('hidden');
     app.classList.add('hidden');
@@ -275,6 +293,7 @@ document.querySelectorAll('.tab').forEach(t => {
     document.getElementById('tab-orders').classList.toggle('hidden', t.dataset.tab !== 'orders');
     document.getElementById('tab-offers').classList.toggle('hidden', t.dataset.tab !== 'offers');
     document.getElementById('tab-banner').classList.toggle('hidden', t.dataset.tab !== 'banner');
+    document.getElementById('tab-reviews').classList.toggle('hidden', t.dataset.tab !== 'reviews');
   });
 });
 
@@ -352,7 +371,7 @@ async function loadProducts(){
   const { data, error } = await sb.from('products').select('*').order('category').order('id');
   const body = document.getElementById('productsBody');
   body.innerHTML = '';
-  if(error){ body.innerHTML = '<tr><td colspan="8">Error: '+error.message+'</td></tr>'; return; }
+  if(error){ body.innerHTML = '<tr><td colspan="9">Error: '+error.message+'</td></tr>'; return; }
   allProducts = data; renderDash();
   for(const p of data){
     const tr = document.createElement('tr');
@@ -365,12 +384,22 @@ async function loadProducts(){
       <td data-label="Price">৳${p.price}</td>
       <td data-label="Stock">${stockSummary(p.stock, p.category)}</td>
       <td data-label="New?">${p.is_new ? '<span class="pill new">New</span>' : ''}</td>
+      <td data-label="সাইটে"><button class="${p.active===false?'secondary':'primary'}" data-vis="${p.id}" style="padding:.3rem .6rem;font-size:.8rem">${p.active===false?'লুকানো (OFF)':'দেখা যাচ্ছে (ON)'}</button></td>
       <td class="c-act">
         <button class="secondary" data-edit="${p.id}">Edit</button>
         <button class="danger" data-del="${p.id}">Delete</button>
       </td>`;
+    if(p.active===false) tr.style.opacity = '.55';
     body.appendChild(tr);
   }
+  body.querySelectorAll('[data-vis]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const p = data.find(x => x.id === btn.dataset.vis), nv = p.active === false;
+      const { error } = await sb.from('products').update({ active: nv }).eq('id', p.id);
+      if(error){ alert('Error: ' + error.message + ' (hide-products.sql চালানো হয়েছে?)'); return; }
+      loadProducts();
+    });
+  });
   body.querySelectorAll('[data-edit]').forEach(btn => {
     btn.addEventListener('click', () => editProduct(btn.dataset.edit, data));
   });
@@ -393,6 +422,7 @@ function editProduct(id, data){
   document.getElementById('p_colors').value = (p.colors||[]).join(', ');
   renderStockRow(p.category, p.stock || {});
   document.getElementById('p_new').value = String(!!p.is_new);
+  document.getElementById('p_active').value = String(p.active !== false);
   imgItems = (p.images || []).map(url => ({ url }));
   renderImagePreview();
   window.scrollTo(0,0);
@@ -404,6 +434,7 @@ function resetForm(){
   document.getElementById('formTitle').textContent = 'Add new product';
   document.getElementById('p_editing_id').value = '';
   document.getElementById('p_id').value = '';
+  document.getElementById('p_active').value = 'true';
   document.getElementById('p_id').disabled = false;
   document.getElementById('p_name').value = '';
   document.getElementById('p_category').value = 'Panjabi';
@@ -446,6 +477,7 @@ document.getElementById('p_saveBtn').addEventListener('click', async () => {
       id, name, category, price, description, colors, images,
       sizes: sizesFor(category), stock, in_stock, is_new
     };
+    if(allProducts.length && 'active' in allProducts[0]) payload.active = document.getElementById('p_active').value === 'true';
     const { error } = await sb.from('products').upsert(payload, { onConflict: 'id' });
     if(error) throw error;
     msg.className = 'msg ok'; msg.textContent = 'Saved.';
@@ -670,6 +702,80 @@ document.getElementById('bn_save').addEventListener('click', async () => {
   const { error } = await sb.from('site_settings').upsert({ key: 'announcement', value, updated_at: new Date().toISOString() });
   if(error){ msg.textContent = 'Error: ' + error.message; return; }
   msg.textContent = 'সেভ হয়েছে ✓ (সাইটে রিফ্রেশ দিলে দেখা যাবে)';
+});
+
+// ---------- REVIEWS (screenshot slideshow) ----------
+let RVS = { on: true, items: [] };
+async function loadReviews(){
+  const msg = document.getElementById('rv_msg'); msg.className = 'msg'; msg.textContent = '';
+  const { data, error } = await sb.from('site_settings').select('value').eq('key', 'reviews').maybeSingle();
+  if(error){ msg.textContent = 'Error: ' + error.message + ' (reviews.sql চালানো হয়েছে?)'; }
+  else if(data && data.value && Array.isArray(data.value.items)) RVS = { on: data.value.on !== false, items: data.value.items };
+  document.getElementById('rv_on').checked = RVS.on;
+  renderReviews();
+}
+async function saveReviews(okText){
+  const msg = document.getElementById('rv_msg'); msg.className = 'msg';
+  const { error } = await sb.from('site_settings').upsert({ key: 'reviews', value: RVS, updated_at: new Date().toISOString() });
+  if(error){ msg.textContent = 'Error: ' + error.message; return false; }
+  msg.textContent = okText || 'সেভ হয়েছে ✓'; return true;
+}
+function renderReviews(){
+  const box = document.getElementById('rv_list');
+  if(!RVS.items.length){ box.textContent = 'কোনো ছবি নেই।'; return; }
+  box.innerHTML = '';
+  RVS.items.forEach((it, i) => {
+    const d = document.createElement('div');
+    d.className = 'rvc' + (it.on === false ? ' off' : '');
+    d.innerHTML = `<img src="${esc(it.url)}" alt="">
+      <div class="rvb"><button type="button" data-mv="-1" ${i===0?'disabled':''} aria-label="আগে নিন">◀</button><button type="button" data-mv="1" ${i===RVS.items.length-1?'disabled':''} aria-label="পরে নিন">▶</button></div>
+      <div class="rvb"><button type="button" class="pr" data-tg="1">${it.on === false ? 'চালু করুন' : 'বন্ধ করুন'}</button><button type="button" class="pr" data-del="1">মুছুন</button></div>`;
+    d.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', async () => {
+      const j = i + parseInt(b.dataset.mv, 10); if(j < 0 || j >= RVS.items.length) return;
+      [RVS.items[i], RVS.items[j]] = [RVS.items[j], RVS.items[i]]; renderReviews(); await saveReviews();
+    }));
+    d.querySelector('[data-tg]').addEventListener('click', async () => { it.on = it.on === false; renderReviews(); await saveReviews(); });
+    d.querySelector('[data-del]').addEventListener('click', async () => {
+      if(!confirm('এই স্ক্রিনশট মুছে ফেলবেন?')) return;
+      RVS.items.splice(i, 1); renderReviews();
+      if(await saveReviews('মুছে ফেলা হয়েছে ✓')){
+        try{ const m = String(it.url).split('/product-images/')[1]; if(m) await sb.storage.from('product-images').remove([decodeURIComponent(m)]); }catch(e){}
+      }
+    });
+    box.appendChild(d);
+  });
+}
+function shrinkImage(file){
+  return new Promise(res => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 1000, k = Math.min(1, max / img.width), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
+      c.toBlob(b => res(b || file), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); res(file); };
+    img.src = u;
+  });
+}
+document.getElementById('rv_on').addEventListener('change', async e => { RVS.on = e.target.checked; await saveReviews(RVS.on ? 'সেকশন চালু ✓' : 'সেকশন বন্ধ ✓'); });
+document.getElementById('rv_add').addEventListener('click', async () => {
+  const msg = document.getElementById('rv_msg'), inp = document.getElementById('rv_files'), btn = document.getElementById('rv_add');
+  msg.className = 'msg';
+  const files = [...inp.files]; if(!files.length){ msg.textContent = 'আগে স্ক্রিনশট বাছুন।'; return; }
+  btn.disabled = true; let n = 0;
+  try{
+    for(const f of files){
+      msg.textContent = 'আপলোড হচ্ছে ' + (n + 1) + '/' + files.length + '...';
+      const blob = await shrinkImage(f);
+      const path = 'reviews/' + Date.now() + '-' + n + '.jpg';
+      const { error } = await sb.storage.from('product-images').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+      if(error) throw error;
+      RVS.items.push({ url: sb.storage.from('product-images').getPublicUrl(path).data.publicUrl, on: true }); n++;
+    }
+    await saveReviews(n + 'টি স্ক্রিনশট যোগ হয়েছে ✓'); inp.value = ''; renderReviews();
+  }catch(e){ msg.textContent = 'Error: ' + (e.message || e); if(n){ await saveReviews(); renderReviews(); } }
+  btn.disabled = false;
 });
 
 // ---------- PRINT (invoice + delivery slip) ----------
