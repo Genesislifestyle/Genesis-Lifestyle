@@ -184,6 +184,12 @@
           <tbody id="productsBody"></tbody>
         </table></div>
       </div>
+      <div class="card">
+        <h3 style="margin-top:0">সাইট দ্রুত করার টুল (ছবি সরানো)</h3>
+        <p class="small">কিছু প্রোডাক্টের ছবি ডাটাবেসের ভেতরে কোড আকারে বসানো, তাই সাইট ভারী হয়। এই বাটন সেগুলোকে ছোট ছবির ফাইল বানিয়ে আলাদা জায়গায় রাখবে এবং প্রোডাক্টে নতুন লিংক বসাবে। শুরুর আগে নিজে থেকে প্রোডাক্টের ব্যাকআপ ফাইল নেমে আসবে। একবারই চালালে হবে, দুবার চালালেও ক্ষতি নেই। চলার সময় পেজ বন্ধ করবেন না।</p>
+        <button class="primary" id="mgBtn">ছবি দ্রুত করুন</button>
+        <pre id="mgLog" class="small" style="white-space:pre-wrap;margin-top:.8rem"></pre>
+      </div>
     </div>
 
     <div id="tab-offers" class="hidden">
@@ -337,9 +343,10 @@ async function uploadImages(files, productId){
   const urls = [];
   for(const file of files){
     const path = productId + '/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9.\-_]/g,'_');
-    const { error } = await sb.storage.from('product-images').upload(path, file, { upsert: true });
+    const small = await shrinkImage(file, 1200);
+    const { error } = await sb.storage.from('product-images').upload(path.replace(/\.[^.]*$/, '') + '.jpg', small, { upsert: true, contentType: 'image/jpeg', cacheControl: '31536000' });
     if(error){ throw error; }
-    const { data } = sb.storage.from('product-images').getPublicUrl(path);
+    const { data } = sb.storage.from('product-images').getPublicUrl(path.replace(/\.[^.]*$/, '') + '.jpg');
     urls.push(data.publicUrl);
   }
   return urls;
@@ -786,11 +793,11 @@ function renderReviews(){
     box.appendChild(d);
   });
 }
-function shrinkImage(file){
+function shrinkImage(file, max0){
   return new Promise(res => {
     const img = new Image(), u = URL.createObjectURL(file);
     img.onload = () => {
-      const max = 1000, k = Math.min(1, max / img.width), c = document.createElement('canvas');
+      const max = max0 || 1000, k = Math.min(1, max / img.width), c = document.createElement('canvas');
       c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
       c.toBlob(b => res(b || file), 'image/jpeg', 0.85);
@@ -816,6 +823,61 @@ document.getElementById('rv_add').addEventListener('click', async () => {
     }
     await saveReviews(n + 'টি স্ক্রিনশট যোগ হয়েছে ✓'); inp.value = ''; renderReviews();
   }catch(e){ msg.textContent = 'Error: ' + (e.message || e); if(n){ await saveReviews(); renderReviews(); } }
+  btn.disabled = false;
+});
+
+// ---------- IMAGE MIGRATION (base64 in DB -> Storage files) ----------
+function dataUrlToBlob(du, max){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(b => b ? res(b) : rej(new Error('ছবি বদলানো যায়নি')), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => rej(new Error('ছবি পড়া যায়নি'));
+    img.src = du;
+  });
+}
+document.getElementById('mgBtn').addEventListener('click', async () => {
+  const log = document.getElementById('mgLog'), btn = document.getElementById('mgBtn');
+  const say = t => { log.textContent += t + '\n'; };
+  log.textContent = '';
+  btn.disabled = true;
+  try{
+    const { data, error } = await sb.from('products').select('*').order('id');
+    if(error) throw error;
+    const todo = data.filter(p => Array.isArray(p.images) && p.images.some(u => /^data:image\//i.test(u)));
+    if(!todo.length){ say('সব ছবি আগে থেকেই ঠিক আছে, কিছু করার নেই ✓'); btn.disabled = false; return; }
+    const n = todo.reduce((a, p) => a + p.images.filter(u => /^data:image\//i.test(u)).length, 0);
+    if(!confirm(todo.length + 'টি প্রোডাক্টের ' + n + 'টি ছবি সরানো হবে। আগে ব্যাকআপ ফাইল নামবে। শুরু করবেন?')){ btn.disabled = false; return; }
+    const d = new Date(), tp = x => String(x).padStart(2, '0');
+    const bk = new Blob([JSON.stringify(data)], { type: 'application/json' }), a = document.createElement('a');
+    a.href = URL.createObjectURL(bk); a.download = 'genesis-products-backup-' + d.getFullYear() + '-' + tp(d.getMonth()+1) + '-' + tp(d.getDate()) + '.json';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    say('ব্যাকআপ ফাইল নামানো হয়েছে ✓ (সেটা নিরাপদ জায়গায় রাখুন)');
+    let before = 0, after = 0, done = 0;
+    for(const p of todo){
+      say(p.id + ' ...');
+      const imgs = [];
+      for(let i = 0; i < p.images.length; i++){
+        const u = p.images[i];
+        if(!/^data:image\//i.test(u)){ imgs.push(u); continue; }
+        before += u.length;
+        const blob = await dataUrlToBlob(u, 1200);
+        const path = p.id + '/m-' + Date.now() + '-' + i + '.jpg';
+        const { error: ue } = await sb.storage.from('product-images').upload(path, blob, { upsert: true, contentType: 'image/jpeg', cacheControl: '31536000' });
+        if(ue) throw ue;
+        after += blob.size; done++;
+        imgs.push(sb.storage.from('product-images').getPublicUrl(path).data.publicUrl);
+      }
+      const { error: pe } = await sb.from('products').update({ images: imgs }).eq('id', p.id);
+      if(pe) throw pe;
+    }
+    say('শেষ ✓ ' + done + 'টি ছবি সরানো হয়েছে। আগে প্রায় ' + Math.round(before / 1024) + ' KB, এখন প্রায় ' + Math.round(after / 1024) + ' KB।');
+    loadProducts();
+  }catch(e){ say('থেমে গেছে: ' + (e.message || e) + '\nযা সরানো হয়েছে তা ঠিক আছে, কিছু নষ্ট হয়নি। আবার চালালে বাকিটা হবে।'); }
   btn.disabled = false;
 });
 
