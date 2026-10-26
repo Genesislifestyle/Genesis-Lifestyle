@@ -214,7 +214,7 @@ async function loadProductsFromDB(){
  try{
   const{data,error}=await sb.from('products').select('*');
   if(error||!data||!data.length)return;
-  const mapped=data.filter(d=>d.active!==false).map(d=>({id:d.id,n:d.name,c:d.category,p:d.price,desc:d.description,cols:d.colors||[],imgs:d.images||[],nw:d.is_new?1:0,stock:d.stock||{}}));
+  const mapped=data.filter(d=>d.active!==false).map(d=>({id:d.id,n:d.name,c:d.category,p:d.price,desc:d.description,cols:d.colors||[],imgs:d.images||[],nw:d.is_new?1:0,stock:d.stock||{},old:d.old_price>d.price?d.old_price:0}));
   P.length=0;mapped.forEach(m=>P.push(m));
   cart=cart.filter(i=>P.some(p=>p.id===i.id));wish=wish.filter(id=>P.some(p=>p.id===id));
   route(true);
