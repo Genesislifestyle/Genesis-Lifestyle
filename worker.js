@@ -5,7 +5,7 @@ const SB_KEY = 'sb_publishable_wCiaA3nANyjWU6-hi_FrTg_UqX9pBXv'; // public key (
 const SITE = 'https://genesislifestylebd.com';
 
 const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const absImg = u => /^https?:\/\//i.test(u) ? u : SITE + '/' + encodeURI(String(u).replace(/^\/+/, ''));
+const absImg = (u, id, i) => /^data:/i.test(u) ? SITE + '/pi/' + id + '/' + i : /^https?:\/\//i.test(u) ? u : SITE + '/' + encodeURI(String(u).replace(/^\/+/, ''));
 
 async function sb(path) {
   const r = await fetch(SB_URL + '/rest/v1/' + path, { headers: { apikey: SB_KEY } });
@@ -20,6 +20,8 @@ export default {
       if (u.pathname === '/sitemap.xml') return await sitemap(req, env);
       const m = u.pathname.match(/^\/p\/([A-Za-z0-9_-]+)\/?$/);
       if (m) return await productPage(req, env, m[1]);
+      const im = u.pathname.match(/^\/pi\/([A-Za-z0-9_-]+)\/(\d+)$/);
+      if (im) return await productImage(im[1], Number(im[2]));
     } catch (e) { /* fall through to the normal site */ }
     if (u.pathname.startsWith('/p/')) return Response.redirect(SITE + '/#/shop', 302);
     return env.ASSETS.fetch(req);
@@ -27,7 +29,7 @@ export default {
 };
 
 function buildProductHtml(html, p, id) {
-  const imgs = (Array.isArray(p.images) ? p.images : []).filter(Boolean).map(absImg);
+  const imgs = (Array.isArray(p.images) ? p.images : []).map((x, i) => x ? absImg(x, id, i) : '').filter(Boolean);
   const img = imgs[0] || SITE + '/og.jpg';
   const price = Number(p.price) || 0;
   const desc = ((p.description || '').replace(/\s+/g, ' ').trim().slice(0, 180) + (price ? ' | মূল্য ৳' + price : '')).trim() || 'Genesis Lifestyle, বগুড়া';
@@ -67,9 +69,24 @@ async function productPage(req, env, id) {
 
 async function sitemap(req, env) {
   let rows;
-  try { rows = await sb('products?select=*'); } catch (e) { return env.ASSETS.fetch(req); }
+  try { rows = await sb('products?select=id,active'); } catch (e) {
+    try { rows = await sb('products?select=id'); } catch (e2) { return env.ASSETS.fetch(req); }
+  }
   const urls = [SITE + '/'].concat(rows.filter(r => r.active !== false && /^[A-Za-z0-9_-]+$/.test(r.id)).map(r => SITE + '/p/' + r.id));
   const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     urls.map((x, i) => '<url><loc>' + x + '</loc><changefreq>weekly</changefreq><priority>' + (i ? '0.7' : '1.0') + '</priority></url>').join('\n') + '\n</urlset>\n';
   return new Response(xml, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+}
+
+async function productImage(id, i) {
+  const rows = await sb('products?id=eq.' + encodeURIComponent(id) + '&select=images');
+  const u = rows[0] && Array.isArray(rows[0].images) ? rows[0].images[i] : '';
+  if (!u) return new Response('not found', { status: 404 });
+  const d = String(u).match(/^data:(image\/[a-z0-9.+-]+);base64,(.+)$/i);
+  if (d) {
+    const bin = atob(d[2]), bytes = new Uint8Array(bin.length);
+    for (let k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
+    return new Response(bytes, { headers: { 'content-type': d[1], 'cache-control': 'public, max-age=86400' } });
   }
+  return Response.redirect(absImg(u, id, i), 302);
+}
