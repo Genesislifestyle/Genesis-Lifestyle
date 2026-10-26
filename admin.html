@@ -15,6 +15,7 @@
   .tabs{display:flex;gap:.5rem;margin-bottom:1.2rem}
   .tab{padding:.5rem 1rem;border-radius:6px;border:1px solid var(--line);cursor:pointer;background:var(--panel);color:var(--ink)}
   .tab.active{background:var(--gold);color:#14120F;border-color:var(--gold)}
+  .oit{display:flex;gap:.5rem;align-items:center;margin:.2rem 0}.oit img,.oit-n{width:46px;height:56px;flex:0 0 46px;object-fit:cover;border-radius:4px;background:#00000022}
   .rvg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}.rvc{border:1px solid var(--line);border-radius:8px;padding:.5rem;background:var(--panel)}.rvc img{width:100%;height:200px;object-fit:contain;background:#00000014;border-radius:6px}.rvc.off img{opacity:.35}.rvb{display:flex;gap:.4rem;margin-top:.4rem}.rvb button{flex:1;padding:.35rem .2rem;font-size:.8rem}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:1rem;margin-bottom:1rem}
   label{display:block;font-size:.8rem;opacity:.8;margin-top:.7rem}
@@ -378,6 +379,7 @@ async function loadProducts(){
   body.innerHTML = '';
   if(error){ body.innerHTML = '<tr><td colspan="9">Error: '+error.message+'</td></tr>'; return; }
   allProducts = data; renderDash();
+  try{ if(allOrders.length && document.getElementById('ordersBody').children.length) renderOrders(); }catch(e){}
   for(const p of data){
     const tr = document.createElement('tr');
     const img = (p.images && p.images[0]) ? '<img class="thumb" src="'+p.images[0]+'">' : '';
@@ -544,7 +546,11 @@ function renderOrders(){
   body.innerHTML = '';
   if(!list.length){ body.innerHTML = '<tr><td colspan="9">কোনো অর্ডার নেই।</td></tr>'; return; }
   for(const o of list){
-    const itemsSummary = (o.items||[]).map(it => (it.name||it.id) + (it.size&&it.size!=='Free'?' ('+it.size+')':'') + ' x' + (it.qty||1)).join(', ');
+    const itemsHtml = (o.items||[]).map(it => {
+      const pr = (allProducts||[]).find(x => x.id === it.id), im = pr && pr.images && pr.images[0];
+      const lbl = esc((it.name||it.id) + (it.size&&it.size!=='Free'?' ('+it.size+')':'') + (it.color?' · '+it.color:'') + ' x' + (it.qty||1));
+      return `<div class="oit">${im ? `<img src="${esc(im)}" alt="" loading="lazy">` : '<span class="oit-n"></span>'}<span>${lbl}</span></div>`;
+    }).join('');
     const p = payInfo(o);
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -552,7 +558,7 @@ function renderOrders(){
       <td data-label="Customer">${esc(o.customer_name)}</td>
       <td data-label="Phone"><a href="tel:${esc(o.phone)}" style="color:inherit">${esc(o.phone)}</a></td>
       <td data-label="Address" class="small">${esc(o.address||'')}${o.notes?'<br>'+esc(o.notes):''}</td>
-      <td data-label="Items" class="small">${esc(itemsSummary)}</td>
+      <td data-label="Items" class="small">${itemsHtml}</td>
       <td data-label="Total">${tk(o.total)}<br><span class="pill ${p.paid?'delivered':'processing'}">${p.paid?'bKash paid':'COD'}</span></td>
       <td data-label="Status">
         <select class="status-select" data-order="${esc(o.id)}">
