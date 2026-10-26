@@ -309,7 +309,7 @@ product:id=>{const p=P.find(x=>x.id===id);if(!p)return['Not found',`<section cla
  const msg=wa(`Hello Genesis Lifestyle, I want to ask about ${p.n} (${p.id}).${noSize?'':' Size: '+(sel.s||'not chosen')+'.'} Color: ${sel.c}. ${location.href}`);
  const stN=z=>p.stock&&p.stock[z]!==undefined?(+p.stock[z]||0):null,totSt=(noSize?['Free']:pSz).reduce((a,z)=>a+(stN(z)||0),0),haveSt=p.stock&&Object.keys(p.stock).length>0;
  const lowStk=!SHOW_LOW_STOCK||outOfStock||!haveSt?'':(sel.s&&sel.s!=='Free'&&stN(sel.s)===1?'<p class="lowst">এই সাইজের মাত্র ১ পিস বাকি আছে</p>':(totSt>0&&totSt<=3?`<p class="lowst">দ্রুত শেষ হচ্ছে — মাত্র ${totSt} পিস বাকি</p>`:''));
- const shUrl='https://genesislifestylebd.com/#/product/'+id;
+ const shUrl='https://genesislifestylebd.com/p/'+id;
  const gi=sel.gi||0,gal=p.imgs?`<div class="ph"><img src="${p.imgs[gi]}" alt="${p.n}" loading="lazy"></div><div class="gal">${p.imgs.map((im,n)=>`<button class="th${n===gi?' on':''}" data-a="gimg" data-i="${n}"><img src="${im}" alt=""></button>`).join('')}</div>`:tile(p,sel.c);
  return[p.n+' | Genesis Lifestyle',`<section class="w pd"><div>${gal}</div><div><h1>${p.n}</h1><p class="mut">Code: ${p.id}</p>${price(p)}${lowStk}<p>${p.desc||''}</p>
 ${noSize?'':`<h3>Size</h3><div class="opt">${pSz.map(z=>availSz.includes(z)?`<button data-a="size" data-v="${z}" aria-pressed="${sel.s===z}">${z}</button>`:`<button disabled aria-disabled="true" title="Out of stock" class="oos">${z}</button>`).join('')}</div>${outOfStock?'<p class="mut">এই মুহূর্তে স্টকে নেই।</p>':(availSz.length<pSz.length?'<p class="mut" style="font-size:.85rem">কাটা সাইজগুলো এখন স্টকে নেই।</p>':'')}<p><a href="#/size">Size guide</a></p>`}
