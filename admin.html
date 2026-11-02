@@ -703,7 +703,7 @@ function renderOrders(){
     if(!confirm(`${o.customer_name} (${o.phone})\nSteadfast-এ পাঠাবেন?\nকালেক্ট করবে: ${paid ? '৳0 (bKash পেইড)' : tk(o.total)}`)) return;
     b.disabled = true; b.textContent = 'পাঠানো হচ্ছে...';
     try {
-      const { data, error } = await sb.functions.invoke('steadfast-send', { body: { order_id: o.id } });
+      const { data, error } = await sb.functions.invoke('rapid-function', { body: { order_id: o.id } });
       let msg = data && data.error;
       if(error && !msg){ try { const j = await error.context.json(); msg = j.error; } catch(e) { msg = 'ফাংশন পাওয়া যায়নি বা চালু নেই (steadfast-send deploy করা হয়েছে?)'; } }
       if(msg){ alert(msg); b.disabled = false; b.textContent = 'Steadfast-এ পাঠান'; return; }
