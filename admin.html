@@ -228,6 +228,9 @@
 
       <div class="card">
         <h3 style="margin-top:0">All products</h3>
+        <div class="ochips" id="prodChips"></div>
+        <input id="prodSearch" type="search" placeholder="প্রোডাক্টের নাম বা কোড লিখে খুঁজুন…" style="margin-bottom:.8rem">
+        <div class="small" id="prodCount" style="margin-bottom:.5rem"></div>
         <div class="tscroll"><table>
           <thead><tr><th>Img</th><th>Code</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>New?</th><th>সাইটে</th><th></th></tr></thead>
           <tbody id="productsBody"></tbody>
@@ -454,6 +457,25 @@ function stockSummary(stock, cat){
   return sizes.map(z => (parseInt(stock[z],10)||0) > 0 ? z+':'+stock[z] : '').filter(Boolean).join(' · ');
 }
 
+let PCAT='all', PQ='';
+function applyProdFilter(){
+  const q = PQ.trim().toLowerCase(); let n = 0;
+  document.querySelectorAll('#productsBody tr').forEach(tr => {
+    const ok = (PCAT==='all' || tr.dataset.cat===PCAT) && (!q || (tr.dataset.q||'').includes(q));
+    tr.style.display = ok ? '' : 'none'; if(ok) n++;
+  });
+  document.querySelectorAll('#prodChips .chip').forEach(b => b.classList.toggle('on', b.dataset.cat===PCAT));
+  const c = document.getElementById('prodCount'); if(c) c.textContent = n + ' টি প্রোডাক্ট দেখাচ্ছে';
+}
+function renderProdChips(data){
+  const cats = {}; data.forEach(p => { cats[p.category] = (cats[p.category]||0)+1; });
+  if(PCAT!=='all' && !cats[PCAT]) PCAT = 'all';
+  const box = document.getElementById('prodChips');
+  box.innerHTML = '<button type="button" class="chip" data-cat="all">সব<i>'+data.length+'</i></button>' +
+    Object.keys(cats).sort().map(c => '<button type="button" class="chip" data-cat="'+c+'">'+c+'<i>'+cats[c]+'</i></button>').join('');
+  box.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { PCAT = b.dataset.cat; applyProdFilter(); }));
+}
+document.getElementById('prodSearch').addEventListener('input', e => { PQ = e.target.value; applyProdFilter(); });
 async function loadProducts(){
   const { data, error } = await sb.from('products').select('*').order('category').order('id');
   const body = document.getElementById('productsBody');
@@ -478,8 +500,10 @@ async function loadProducts(){
         <button class="danger" data-del="${p.id}">Delete</button>
       </td>`;
     if(p.active===false) tr.style.opacity = '.55';
+    tr.dataset.cat = p.category; tr.dataset.q = (p.id+' '+p.name).toLowerCase();
     body.appendChild(tr);
   }
+  renderProdChips(data); applyProdFilter();
   body.querySelectorAll('[data-vis]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const p = data.find(x => x.id === btn.dataset.vis), nv = p.active === false;
