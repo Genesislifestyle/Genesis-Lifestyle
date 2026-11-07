@@ -170,6 +170,21 @@ footer .fsl .soc{color:#e9e4d6}
 .fbot .w{display:flex!important;flex-direction:column;align-items:center;gap:.8rem}.fpay{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}.fpay span{border:1px solid #3a382e;border-radius:6px;padding:.25rem .7rem;font-size:.78rem;color:#d9d4c7}.ftop{background:none;border:1px solid #E2BE6A;color:#E2BE6A;border-radius:999px;padding:.4rem 1.1rem;font:inherit;font-size:.85rem;cursor:pointer}.ftop:hover{background:#E2BE6A;color:#0f1013}
 @media(min-width:900px){.fbot .w{flex-direction:row;justify-content:center}.fbot .w .fpay{order:1}.fbot .w p{order:2}.fbot .w .ftop{order:3}}
 .flogo .fln{display:flex;flex-direction:column;gap:.25rem}.flogo .fln em.ftag{margin:0!important;letter-spacing:.02em;font-size:.95rem;font-weight:400;text-transform:none;color:#E2BE6A!important;opacity:.9}.fgap{height:1rem}
+.vsr{background:linear-gradient(180deg,#f6f1e3,#efe7d2);border-top:1px solid #e2d8bb;border-bottom:1px solid #e2d8bb;margin:2.5rem 0 0;padding:2.5rem 0;color:#1d1b16}
+.vsg{display:grid;gap:1.8rem;background:#fff;border:1px solid #e6dcc0;border-radius:22px;padding:1.6rem 1.3rem;box-shadow:0 18px 40px -22px rgba(80,60,10,.35);position:relative}
+.vsg:before{content:'';position:absolute;left:1.3rem;top:-1px;width:4.5rem;height:4px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,#E2BE6A,#C6981E)}
+.vse{display:block;font-size:.75rem;letter-spacing:.28em;color:#A9801A;font-weight:700;margin-bottom:.6rem}
+.vsr h2{color:#15140f;font-size:clamp(1.9rem,6vw,2.6rem);margin:0 0 .8rem}
+.vsl{color:#5d584a;margin:0 0 1.4rem;line-height:1.7}
+.vsc{list-style:none;padding:0;margin:0 0 1.6rem;display:grid;gap:1rem}.vsc li{display:flex;gap:.9rem;align-items:flex-start;line-height:1.5}
+.vsc svg{flex:none;width:2.5rem;height:2.5rem;padding:.65rem;border-radius:50%;background:#f6efd9;color:#A9801A}
+.vsc b{color:#A9801A;font-weight:700;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}.vsc a{color:#15140f;text-decoration:none}
+.vsb{display:flex;flex-wrap:wrap;gap:.7rem}
+.vsr .bt{background:#fff;color:#15140f;border:1px solid #cfc3a0}.vsr .bt.vsp{background:#15140f;color:#E2BE6A;border-color:#15140f;font-weight:600}.vsr .bt:hover{border-color:#A9801A;color:#A9801A}.vsr .bt.vsp:hover{background:#2a2820;color:#f0cf7a}
+.vsvt{color:#A9801A;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;margin:0 0 .8rem;text-align:center;font-weight:700}
+.vsv{background:#f6f1e3;border-radius:18px;padding:1.2rem 1rem 1rem}
+.vsr .vd{max-width:300px;margin:0 auto}.vsr .vf{background:#111;border-radius:26px;padding:8px;box-shadow:0 14px 30px -14px rgba(0,0,0,.5)}.vsr .vf iframe{border-radius:20px;display:block}.vsr .vl{text-align:center}.vsr .vl a{color:#8a6a14}
+@media(min-width:900px){.vsg{grid-template-columns:1.25fr 1fr;align-items:center;gap:3rem;padding:2.4rem 2.4rem}.vsg:before{left:2.4rem}}
 </style>
 </head>
 <body>
@@ -352,8 +367,7 @@ ${CFG.promo?`<section class="sof"><div class="w"><h2>${CFG.promo.t}</h2><p>${CFG
 <div class="wc"><span class="wi">${ICO.swap}</span><h3>সহজ এক্সচেঞ্জ</h3><p class="mut">সাইজ সমস্যা হলে পণ্য পাওয়ার ২৪ ঘণ্টার মধ্যে ছবি ও ভিডিওসহ জানান। <a href="#/returns">নিয়ম দেখুন</a></p></div>
 </div></div></section>
 ${rvHTML()}
-<section class="w"><h2>Visit our showroom</h2><p>Genesis Lifestyle<br>${ADDR.replace(/, /g,'<br>')}</p><p class="mut">Showroom hours: 11 AM – 8 PM. Closed on Fridays.</p><div class="row"><a class="bt" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Police+Plaza+Bogura">Get directions</a><a class="bt o" href="#/contact">Contact</a><a class="bt o wl" href="#">WhatsApp</a></div></section>
-<section class="w"><h2>শোরুমের ভিডিও</h2>${vid()}</section>`],
+<section class="vsr"><div class="w"><div class="vsg"><div class="vsi"><span class="vse">VISIT US</span><h2>Visit our showroom</h2><p class="vsl">বগুড়ার পুলিশ প্লাজায় এসে সরাসরি পোশাক দেখুন, পরে দেখে পছন্দ করুন।</p><ul class="vsc"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span><b>Genesis Lifestyle</b><br>Police Plaza, 5th Floor<br>Shop No. 511–512<br>Bogura, Bangladesh</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span><b>Showroom hours</b><br>11 AM – 8 PM · Closed on Fridays</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg><span><b>Phone &amp; WhatsApp</b><br><a href="tel:+8801608669888">01608669888</a></span></li></ul><div class="vsb"><a class="bt vsp" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Police+Plaza+Bogura">Get directions →</a><a class="bt o wl" href="#">WhatsApp</a><a class="bt o" href="#/contact">Contact</a></div></div><div class="vsv"><p class="vsvt">শোরুমের ভিডিও</p>${vid()}</div></div></div></section>`],
 shop:q=>{const c=q.get('cat')||'all',s=(q.get('q')||'').toLowerCase(),o=q.get('sort')||'new',fp=q.get('pr')||'',fz=q.get('sz')||'',fc=q.get('col')||'';let l=P.filter(p=>(c==='all'||(c==='new'?p.nw:p.c===c))&&(!s||(p.n+p.c+p.id).toLowerCase().includes(s)));
  const lb0=l,PR=[['0-999','৳১০০০-এর নিচে'],['1000-1499','৳১০০০ – ১৪৯৯'],['1500-2499','৳১৫০০ – ২৪৯৯'],['2500-99999','৳২৫০০ ও বেশি']],szAv=(p,z)=>szOf(p.c).includes(z)&&(!p.stock||p.stock[z]===undefined||p.stock[z]>0);
  const szAll=[...new Set(lb0.flatMap(p=>szOf(p.c)))],colAll=[...new Set(lb0.flatMap(p=>p.cols))];
