@@ -185,6 +185,22 @@ footer .fsl .soc{color:#e9e4d6}
 .vsv{background:#f6f1e3;border-radius:18px;padding:1.2rem 1rem 1rem}
 .vsr .vd{max-width:300px;margin:0 auto}.vsr .vf{background:#111;border-radius:26px;padding:8px;box-shadow:0 14px 30px -14px rgba(0,0,0,.5)}.vsr .vf iframe{border-radius:20px;display:block}.vsr .vl{text-align:center}.vsr .vl a{color:#8a6a14}
 @media(min-width:900px){.vsg{grid-template-columns:1.25fr 1fr;align-items:center;gap:3rem;padding:2.4rem 2.4rem}.vsg:before{left:2.4rem}}
+.wys{background:var(--bg);padding:2.6rem 0;border-top:1px solid var(--line)}
+.wyh{text-align:center;margin-bottom:1.6rem}.wyh .vse{display:block;font-size:.75rem;letter-spacing:.28em;color:#A9801A;font-weight:700;margin-bottom:.5rem}.wyh h2{margin:0 0 .5rem}.wyh p{margin:0;color:var(--mut)}
+.wyg{list-style:none;margin:0;padding:0;display:grid;gap:0;background:var(--soft);border:1px solid var(--line);border-radius:20px;overflow:hidden;counter-reset:wy}
+.wy{display:flex;gap:1rem;align-items:flex-start;padding:1.2rem 1.2rem;border-bottom:1px solid var(--line);position:relative;counter-increment:wy}.wy:last-child{border-bottom:0}
+.wy .wi{flex:none;width:3rem;height:3rem;background:#14120F;color:#E2BE6A;box-shadow:0 0 0 4px rgba(226,190,106,.18)}.wy .wi svg{width:1.4rem;height:1.4rem}
+.wy h3{margin:.1rem 0 .3rem;font-size:1.08rem}.wy p{margin:0;color:var(--mut);line-height:1.65;font-size:.95rem}.wy a{color:#A9801A;font-weight:600}
+.wy:after{content:'0' counter(wy);position:absolute;right:1.1rem;top:.9rem;font-size:.8rem;letter-spacing:.1em;color:#C6981E;opacity:.55;font-weight:700}
+@media(min-width:900px){.wyg{grid-template-columns:repeat(6,1fr)}.wy{grid-column:span 2;flex-direction:column;gap:.9rem;padding:1.8rem 1.6rem;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}.wy:nth-child(3n){border-right:0}.wy:nth-child(n+4){border-bottom:0;grid-column:span 3}.wy:nth-child(4){border-right:1px solid var(--line)}.wy:nth-child(5){border-right:0}.wy:nth-child(n+4){flex-direction:row}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wy .wi{background:#E2BE6A;color:#14120F}}
+:root[data-theme="dark"] .wy .wi{background:#E2BE6A;color:#14120F}
+.wy.rv{opacity:0;transform:translateY(26px)}.wy.rv .wi{transform:scale(.4);opacity:0}
+.wy.rv.in{opacity:1;transform:none;transition:opacity .7s ease var(--d),transform .7s cubic-bezier(.2,.8,.2,1) var(--d)}
+.wy.rv.in .wi{transform:none;opacity:1;transition:transform .6s cubic-bezier(.3,1.5,.5,1) calc(var(--d) + .25s),opacity .4s ease calc(var(--d) + .25s)}
+.wy.rv.in:before{content:'';position:absolute;left:0;top:0;height:2px;background:linear-gradient(90deg,#E2BE6A,transparent);width:100%;animation:wyl 1s ease var(--d) both}
+@keyframes wyl{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@media (prefers-reduced-motion:reduce){.wy.rv,.wy.rv .wi{opacity:1!important;transform:none!important;transition:none!important}.wy.rv.in:before{animation:none}}
 </style>
 </head>
 <body>
@@ -359,13 +375,7 @@ const V={
 <section class="w sec"><h2>New arrivals</h2>${comboStrip()}<div class="slwrap"><button class="slnav prev" data-a="slprev" aria-label="Previous">‹</button><div class="sl" id="slnew">${mixCat(P.filter(p=>p.nw)).map(card).join('')}</div><button class="slnav next" data-a="slnext" aria-label="Next">›</button></div></section>
 <section class="w sec"><h2>All products</h2>${comboStrip()}${grid([...P].sort(catSort))}</section>
 ${CFG.promo?`<section class="sof"><div class="w"><h2>${CFG.promo.t}</h2><p>${CFG.promo.x}</p><a class="bt" href="${CFG.promo.l}">${CFG.promo.b}</a></div></section>`:''}
-<section class="sof"><div class="w"><h2>কেন Genesis Lifestyle-এ কিনবেন</h2><div class="tr wcard">
-<div class="wc"><span class="wi">${ICO.check}</span><h3>বাছাই করা পোশাক</h3><p class="mut">পাঞ্জাবি, শার্ট, পোলো, টি-শার্ট ও প্যান্ট, প্রতিদিন ও অনুষ্ঠানে পরার মতো করে বাছাই করা।</p></div>
-<div class="wc"><span class="wi">${ICO.store}</span><h3>বগুড়ায় আমাদের শোরুম</h3><p class="mut">পুলিশ প্লাজায় এসে নিজে পরে দেখে নিতে পারেন। সকাল ১১টা থেকে রাত ৮টা, শুক্রবার বন্ধ।</p></div>
-<div class="wc"><span class="wi">${ICO.truck}</span><h3>সারা দেশে ডেলিভারি</h3><p class="mut">Steadfast কুরিয়ারে সাধারণত ২-৪ দিনে। ক্যাশ অন ডেলিভারি বা বিকাশে পেমেন্ট।</p></div>
-<div class="wc"><span class="wi">${ICO.chat}</span><h3>WhatsApp-এ সহায়তা</h3><p class="mut">সাইজ, স্টক বা অর্ডার নিয়ে যেকোনো প্রশ্ন সরাসরি জিজ্ঞেস করুন।</p></div>
-<div class="wc"><span class="wi">${ICO.swap}</span><h3>সহজ এক্সচেঞ্জ</h3><p class="mut">সাইজ সমস্যা হলে পণ্য পাওয়ার ২৪ ঘণ্টার মধ্যে ছবি ও ভিডিওসহ জানান। <a href="#/returns">নিয়ম দেখুন</a></p></div>
-</div></div></section>
+<section class="wys"><div class="w"><div class="wyh"><span class="vse">WHY GENESIS</span><h2>কেন Genesis Lifestyle-এ কিনবেন</h2><p>বিশ্বাস নিয়ে কেনাকাটা, এই পাঁচটা কারণে।</p></div><ul class="wyg"><li class="wy"><span class="wi">${ICO.check}</span><div><h3>বাছাই করা পোশাক</h3><p>পাঞ্জাবি, শার্ট, পোলো, টি-শার্ট ও প্যান্ট, প্রতিদিন ও অনুষ্ঠানে পরার মতো করে বাছাই করা।</p></div></li><li class="wy"><span class="wi">${ICO.store}</span><div><h3>বগুড়ায় আমাদের শোরুম</h3><p>পুলিশ প্লাজায় এসে নিজে পরে দেখে নিতে পারেন। সকাল ১১টা থেকে রাত ৮টা, শুক্রবার বন্ধ।</p></div></li><li class="wy"><span class="wi">${ICO.truck}</span><div><h3>সারা দেশে ডেলিভারি</h3><p>Steadfast কুরিয়ারে সাধারণত ২-৪ দিনে। ক্যাশ অন ডেলিভারি বা বিকাশে পেমেন্ট।</p></div></li><li class="wy"><span class="wi">${ICO.chat}</span><div><h3>WhatsApp-এ সহায়তা</h3><p>সাইজ, স্টক বা অর্ডার নিয়ে যেকোনো প্রশ্ন সরাসরি জিজ্ঞেস করুন।</p></div></li><li class="wy"><span class="wi">${ICO.swap}</span><div><h3>সহজ এক্সচেঞ্জ</h3><p>সাইজ সমস্যা হলে পণ্য পাওয়ার ২৪ ঘণ্টার মধ্যে ছবি ও ভিডিওসহ জানান। <a href="#/returns">নিয়ম দেখুন</a></p></div></li></ul></div></section>
 ${rvHTML()}
 <section class="vsr"><div class="w"><div class="vsg"><div class="vsi"><span class="vse">VISIT US</span><h2>Visit our showroom</h2><p class="vsl">বগুড়ার পুলিশ প্লাজায় এসে সরাসরি পোশাক দেখুন, পরে দেখে পছন্দ করুন।</p><ul class="vsc"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span><b>Genesis Lifestyle</b><br>Police Plaza, 5th Floor<br>Shop No. 511–512<br>Bogura, Bangladesh</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span><b>Showroom hours</b><br>11 AM – 8 PM · Closed on Fridays</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg><span><b>Phone &amp; WhatsApp</b><br><a href="tel:+8801608669888">01608669888</a></span></li></ul><div class="vsb"><a class="bt vsp" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Police+Plaza+Bogura">Get directions →</a><a class="bt o wl" href="#">WhatsApp</a><a class="bt o" href="#/contact">Contact</a></div></div><div class="vsv"><p class="vsvt">শোরুমের ভিডিও</p>${vid()}</div></div></div></section>`],
 shop:q=>{const c=q.get('cat')||'all',s=(q.get('q')||'').toLowerCase(),o=q.get('sort')||'new',fp=q.get('pr')||'',fz=q.get('sz')||'',fc=q.get('col')||'';let l=P.filter(p=>(c==='all'||(c==='new'?p.nw:p.c===c))&&(!s||(p.n+p.c+p.id).toLowerCase().includes(s)));
@@ -517,5 +527,8 @@ document.addEventListener('click',e=>{const x=e.target.closest('[data-soon]');if
 document.querySelectorAll('.wl').forEach(a=>a.href=wa('Hello Genesis Lifestyle'));$('#soc').innerHTML=socHTML();$('#yr').textContent=new Date().getFullYear();
 addEventListener('hashchange',()=>route());save();route();annRender();loadProductsFromDB();loadOffer();loadAnn();loadRv();loadCombo();
 </script>
+<script>(function(){try{if(!('IntersectionObserver' in window))return;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.35});
+function scan(){document.querySelectorAll('.wy:not(.rv)').forEach(function(el,i){var n=[].indexOf.call(el.parentNode.children,el);el.style.setProperty('--d',(n*.35)+'s');el.classList.add('rv');io.observe(el)})}
+new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan()}catch(e){}})();</script>
 </body>
 </html>
