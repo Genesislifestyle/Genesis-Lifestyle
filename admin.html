@@ -377,7 +377,7 @@
         <h3 style="margin-top:0">Orders</h3>
         <div class="ochips" id="ordChips"></div>
         <input id="ordSearch" type="search" placeholder="নাম, ফোন নম্বর বা অর্ডার নম্বর দিয়ে খুঁজুন" autocomplete="off">
-        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select id="ordMonth"><option value="all">সব মাস</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button><button class="secondary" id="csvBtn">Excel/CSV নামান</button><button class="primary" id="bkBtn">পুরো ব্যাকআপ নিন (সব অর্ডার)</button></div>
+        <div class="otool"><select id="ordFilter"><option value="all">সব অর্ডার</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select id="ordMonth"><option value="all">সব মাস</option></select><button class="secondary" id="printNew">New অর্ডারগুলো প্রিন্ট</button><button class="secondary" id="csvBtn">Excel/CSV নামান</button><button class="primary" id="bkBtn">পুরো ব্যাকআপ নিন (সব অর্ডার)</button><button class="secondary" id="shBtn" type="button">📊 Google Sheet</button></div>
         <p class="small" id="bkInfo" style="margin:.2rem 0 .6rem"></p>
         <div class="tscroll"><table>
           <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead>
@@ -1215,6 +1215,14 @@ function renderDash(){
 
 renderStockRow('Panjabi', {});
 checkSession();
+</script>
+<script>
+(function(){const K='gl_sheet_url';const b=document.getElementById('shBtn');if(!b)return;
+b.addEventListener('click',function(e){let u='';try{u=localStorage.getItem(K)||''}catch(x){}
+if(e.shiftKey||!u){const v=prompt('আপনার Google Sheet-এর লিংক একবার পেস্ট করুন (এই ফোন/কম্পিউটারে সেভ থাকবে):',u);if(v===null)return;const t=v.trim();if(!/^https:\/\/docs\.google\.com\/spreadsheets\//.test(t)){alert('এটা Google Sheet-এর লিংক মনে হচ্ছে না। docs.google.com/spreadsheets দিয়ে শুরু হওয়া লিংক দিন।');return}
+try{localStorage.setItem(K,t)}catch(x){}u=t}
+window.open(u,'_blank','noopener')});
+b.title='লিংক বদলাতে Shift চেপে ক্লিক করুন (কম্পিউটারে)';})();
 </script>
 </body>
 </html>
