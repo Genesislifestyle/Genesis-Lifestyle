@@ -197,11 +197,11 @@
   .szc.out{background:rgba(224,82,82,.14);border-color:rgba(224,82,82,.55);color:#ff8a8a}
   .stockrow input.zero{border-color:#e05252;background:rgba(224,82,82,.10);color:#ff8a8a}
   .stockrow input.zero:focus{outline:2px solid rgba(224,82,82,.5)}
-  /* orders toolbar: one equal-size swipeable row */
-  .otool{flex-wrap:nowrap!important;overflow-x:auto;gap:.7rem;padding:0 0 .6rem;margin:1rem 0 .8rem;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-  .otool>select,.otool>button{flex:0 0 168px!important;width:168px!important;height:56px;min-height:56px;margin:0!important;padding:.4rem .8rem;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25;font-size:.88rem;white-space:normal;scroll-snap-align:start;box-sizing:border-box}
+  /* orders toolbar: equal-size 2-column grid */
+  .otool{display:grid!important;grid-template-columns:1fr 1fr;gap:.7rem;overflow:visible;padding:0;margin:1rem 0 .8rem}
+  .otool>select,.otool>button{width:100%!important;height:56px;min-height:56px;margin:0!important;padding:.4rem .8rem;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25;font-size:.88rem;white-space:normal}
   .otool>select{text-align-last:center}
-  header .mono{width:auto;height:2.7rem;border:0;border-radius:8px;background:none;display:block}
+  @media(min-width:900px){.otool{grid-template-columns:repeat(6,1fr)}}
 </style>
 </head>
 <body>
