@@ -227,6 +227,18 @@
     #ordersBody tr:not(.open) td[data-label="Status"]{border-bottom:0}
     #ordersBody tr.open{border-color:#5a4e2c;box-shadow:0 0 0 1px rgba(226,190,106,.25)}
   }
+
+  /* v5: call/WhatsApp boxes + bolder labels */
+  .qa a.call,.qa a.wa{flex:1 1 0;min-width:120px;justify-content:center;gap:.5rem;min-height:42px;padding:.55rem .9rem;border-radius:12px;font-weight:700;font-size:.9rem}
+  .qa a.call svg,.qa a.wa svg{width:1.1rem;height:1.1rem;flex:none}
+  .qa a.call{background:linear-gradient(180deg,rgba(226,190,106,.22),rgba(226,190,106,.08));border:1px solid var(--gold);color:var(--gold);box-shadow:0 6px 16px -10px rgba(226,190,106,.6)}
+  .qa a.wa{background:linear-gradient(180deg,rgba(80,200,120,.2),rgba(80,200,120,.07));border:1px solid #3f9a5f;color:#7be0a0;box-shadow:0 6px 16px -10px rgba(80,200,120,.5)}
+  .qa a.call:hover{background:var(--gold);color:#14120F}.qa a.wa:hover{background:#3f9a5f;color:#fff}
+  @media(max-width:700px){
+    #ordersBody td[data-label]::before{font-size:.8rem;font-weight:800;letter-spacing:.11em;top:.92rem}
+    #ordersBody td{padding-left:7.8rem}
+    #ordersBody td[data-label="Customer"],#ordersBody td[data-label="Phone"],#ordersBody td[data-label="Total"]{font-size:1rem}
+  }
 </style>
 </head>
 <body>
@@ -747,7 +759,7 @@ const STL = [['all','সব'],['new','New'],['confirmed','Confirmed'],['processi
 function waNum(ph){ let d = String(ph||'').replace(/\D/g,''); if(d.startsWith('0')) d = '88' + d; else if(!d.startsWith('88')) d = '88' + d; return d; }
 function quickActions(o){
   const msg = `আসসালামু আলাইকুম ${o.customer_name||''}। Genesis Lifestyle থেকে আপনার অর্ডার ${o.order_number||''} (মোট ${tk(o.total)}) পেয়েছি। ঠিকানা: ${o.address||''}। সব ঠিক আছে কি? নিশ্চিত করলে আমরা পাঠিয়ে দেব।`;
-  return `<div class="qa"><a href="tel:${esc(o.phone)}">কল</a><a class="wa" target="_blank" rel="noopener" href="https://wa.me/${esc(waNum(o.phone))}?text=${encodeURIComponent(msg)}">WhatsApp</a></div>`;
+  return `<div class="qa"><a class="call" href="tel:${esc(o.phone)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg><span>কল করুন</span></a><a class="wa" target="_blank" rel="noopener" href="https://wa.me/${esc(waNum(o.phone))}?text=${encodeURIComponent(msg)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 01-13.4 7.8L3 21l1.3-4.4A9 9 0 1121 12z"/></svg><span>WhatsApp</span></a></div>`;
 }
 function renderChips(){
   const cur = document.getElementById('ordFilter').value, box = document.getElementById('ordChips');
