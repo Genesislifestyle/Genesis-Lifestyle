@@ -270,6 +270,11 @@
         #ordersBody td[data-label="Items"] .oit{margin:.2rem 0}
     .card:has(#ordersBody){overflow-x:auto}
   }
+  @media(max-width:700px){
+    #ordersBody td[data-label="Phone"] .qa{flex-direction:row;flex-wrap:nowrap;gap:.4rem;width:100%}
+    #ordersBody td[data-label="Phone"] .qa a.call,#ordersBody td[data-label="Phone"] .qa a.wa{flex:1 1 0;min-width:0;min-height:34px;padding:.3rem .5rem;gap:.3rem;font-size:.78rem;border-radius:10px;white-space:nowrap}
+    #ordersBody td[data-label="Phone"] .qa a.call svg,#ordersBody td[data-label="Phone"] .qa a.wa svg{width:.95rem;height:.95rem}
+  }
 </style>
 </head>
 <body>
