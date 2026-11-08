@@ -240,20 +240,34 @@
     #ordersBody td[data-label="Customer"],#ordersBody td[data-label="Phone"],#ordersBody td[data-label="Total"]{font-size:1rem}
   }
 
-  /* v6: desktop table must never be cut off */
+  /* v7: desktop orders as clean cards (no wide table) */
+  .addr{line-height:1.5;color:var(--ink)}.onote{margin-top:.4rem;padding:.35rem .6rem;border-radius:8px;background:rgba(226,190,106,.1);color:var(--gold);font-size:.8rem}
+  .amt{font-weight:800;font-size:1.1rem}.trx{margin-top:.4rem;font-size:.74rem;color:var(--mut);letter-spacing:.02em}
   @media(min-width:701px){
-    #ordersBody{font-size:.88rem}
-    #ordersBody td,table thead th{padding-left:.55rem;padding-right:.55rem}
-    #ordersBody td[data-label="Address"]{max-width:190px;overflow-wrap:anywhere}
-    #ordersBody td[data-label="Items"]{max-width:230px}
-    #ordersBody td[data-label="Phone"] .qa{flex-direction:column;gap:.4rem}
-    #ordersBody td[data-label="Phone"] .qa a.call,#ordersBody td[data-label="Phone"] .qa a.wa{min-width:0;flex:none;min-height:36px;padding:.35rem .7rem;font-size:.82rem}
-    #ordersBody td.c-act{min-width:112px}
-    #ordersBody td.c-act button{width:100%}
-    #ordersBody td[data-label="Status"] select{min-width:104px;max-width:130px}
-    #ordersBody td[data-label="Date"]{min-width:88px}
+    .card:has(#ordersBody) table,.card:has(#ordersBody) tbody{display:block;width:100%}
+    .card:has(#ordersBody) thead{display:none}
+    #ordersBody tr{display:grid;grid-template-columns:170px 200px minmax(160px,1.1fr) minmax(190px,1.3fr) 150px;grid-template-areas:"ord cust addr items total" "ord phone addr items total" "stat stat date act act";gap:.2rem 0;margin:0 0 1.1rem;padding:1.1rem .6rem .9rem;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#1a1814,#151310);position:relative;font-size:.9rem}
+    #ordersBody tr.o-new{border-color:#5a4e2c;box-shadow:0 0 0 1px rgba(226,190,106,.2)}
+    #ordersBody tr:hover{background:linear-gradient(180deg,#1d1b16,#171512)}
+    #ordersBody td{display:block;border:0;padding:.35rem .9rem;min-width:0;overflow-wrap:anywhere}
+    #ordersBody td[data-label]::before{content:attr(data-label);display:block;color:var(--gold);font-size:.7rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;margin-bottom:.3rem;opacity:1}
+    #ordersBody td.c-name{grid-area:ord;font-size:1.1rem;font-weight:700;color:var(--gold)}
+    #ordersBody td.c-name::before{color:var(--mut)}
+    #ordersBody td[data-label="Customer"]{grid-area:cust;font-weight:600;font-size:1rem}
+    #ordersBody td[data-label="Phone"]{grid-area:phone}
+    #ordersBody td[data-label="Address"]{grid-area:addr;max-width:none}
+    #ordersBody td[data-label="Items"]{grid-area:items;max-width:none}
+    #ordersBody td[data-label="Total"]{grid-area:total}
+    #ordersBody td[data-label="Status"]{grid-area:stat;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .7rem;padding-top:.9rem;margin-top:.5rem;border-top:1px solid var(--line)}
+    #ordersBody td[data-label="Status"]::before{flex:0 0 100%;margin-bottom:0}
+    #ordersBody td[data-label="Status"] select{flex:0 1 190px}
+    #ordersBody td[data-label="Date"]{grid-area:date;color:var(--mut);padding-top:.9rem;margin-top:.5rem;border-top:1px solid var(--line)}
+    #ordersBody td.c-act{grid-area:act;display:flex;justify-content:flex-end;align-items:flex-end;gap:.6rem;padding:.9rem .9rem 0;margin-top:.5rem;border-top:1px solid var(--line);min-width:0}
+    #ordersBody td.c-act button,#ordersBody td.c-act .pill{width:auto;min-width:130px;padding:.5rem 1rem}
+    #ordersBody td[data-label="Phone"] .qa{flex-direction:row;flex-wrap:wrap;gap:.45rem}
+    #ordersBody td[data-label="Phone"] .qa a.call,#ordersBody td[data-label="Phone"] .qa a.wa{flex:1 1 auto;min-width:0;min-height:36px;padding:.35rem .6rem;font-size:.8rem}
+        #ordersBody td[data-label="Items"] .oit{margin:.2rem 0}
     .card:has(#ordersBody){overflow-x:auto}
-    .card:has(#ordersBody) table{min-width:0}
   }
 </style>
 </head>
@@ -808,9 +822,9 @@ function renderOrders(){
       <td data-label="Order #" class="c-name">${esc(o.order_number||o.id.slice(0,8))}</td>
       <td data-label="Customer">${esc(o.customer_name)}</td>
       <td data-label="Phone"><a href="tel:${esc(o.phone)}" style="color:inherit">${esc(o.phone)}</a>${quickActions(o)}</td>
-      <td data-label="Address" class="small">${esc(o.address||'')}${o.notes?'<br>'+esc(o.notes):''}</td>
+      <td data-label="Address" class="small"><div class="addr">${esc(o.address||'')}</div>${(o.notes&&!/^Payment: bKash/.test(o.notes))?'<div class="onote">📝 '+esc(o.notes)+'</div>':''}</td>
       <td data-label="Items" class="small">${itemsHtml}</td>
-      <td data-label="Total">${tk(o.total)}<br><span class="pill ${p.paid?'delivered':'processing'}">${p.paid?'bKash paid':'COD'}</span></td>
+      <td data-label="Total"><div class="amt">${tk(o.total)}</div><span class="pill ${p.paid?'delivered':'processing'}">${p.paid?'bKash paid':'COD'}</span>${(()=>{const m=String(o.notes||'').match(/TrxID:\s*([A-Za-z0-9]+)/);return m?'<div class="trx">TrxID: '+esc(m[1])+'</div>':''})()}</td>
       <td data-label="Status">
         <select class="status-select" data-order="${esc(o.id)}">
           <option value="new" ${o.status==='new'?'selected':''}>New</option>
