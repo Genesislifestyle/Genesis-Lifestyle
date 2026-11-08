@@ -239,6 +239,22 @@
     #ordersBody td{padding-left:7.8rem}
     #ordersBody td[data-label="Customer"],#ordersBody td[data-label="Phone"],#ordersBody td[data-label="Total"]{font-size:1rem}
   }
+
+  /* v6: desktop table must never be cut off */
+  @media(min-width:701px){
+    #ordersBody{font-size:.88rem}
+    #ordersBody td,table thead th{padding-left:.55rem;padding-right:.55rem}
+    #ordersBody td[data-label="Address"]{max-width:190px;overflow-wrap:anywhere}
+    #ordersBody td[data-label="Items"]{max-width:230px}
+    #ordersBody td[data-label="Phone"] .qa{flex-direction:column;gap:.4rem}
+    #ordersBody td[data-label="Phone"] .qa a.call,#ordersBody td[data-label="Phone"] .qa a.wa{min-width:0;flex:none;min-height:36px;padding:.35rem .7rem;font-size:.82rem}
+    #ordersBody td.c-act{min-width:112px}
+    #ordersBody td.c-act button{width:100%}
+    #ordersBody td[data-label="Status"] select{min-width:104px;max-width:130px}
+    #ordersBody td[data-label="Date"]{min-width:88px}
+    .card:has(#ordersBody){overflow-x:auto}
+    .card:has(#ordersBody) table{min-width:0}
+  }
 </style>
 </head>
 <body>
