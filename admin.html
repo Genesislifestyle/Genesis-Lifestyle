@@ -334,6 +334,7 @@
           <div>
             <label>Category</label>
             <select id="p_category">
+              <option>Winter Collection</option>
               <option>Panjabi</option>
               <option>Shirts</option>
               <option>Pants</option>
@@ -572,7 +573,7 @@ async function uploadImages(files, productId){
   return urls;
 }
 
-const SZC = { Panjabi:['M','L','XL'], Polos:['M','L','XL'], Shirts:['M','L','XL'], 'T-shirts':['M','L','XL'], Pants:['30','32','34','36'], Accessories:['Free'] };
+const SZC = { 'Winter Collection':['M','L','XL'], Panjabi:['M','L','XL'], Polos:['M','L','XL'], Shirts:['M','L','XL'], 'T-shirts':['M','L','XL'], Pants:['30','32','34','36'], Accessories:['Free'] };
 function sizesFor(cat){ return SZC[cat] || ['S','M','L','XL','XXL']; }
 
 function renderStockRow(cat, values){
