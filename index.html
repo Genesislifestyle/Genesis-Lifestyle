@@ -539,7 +539,7 @@ function open(l,i){L=l;I=i;let el=g();if(!el){el=document.createElement('div');e
 function close(){const el=g();if(el)el.hidden=true;document.body.style.overflow=''}
 function go(d){I=(I+d+L.length)%L.length;show()}
 document.addEventListener('click',e=>{const el=g();if(el&&!el.hidden&&el.contains(e.target)){if(e.target.closest('.lbx')||e.target===el)close();else if(e.target.closest('.lbp'))go(-1);else if(e.target.closest('.lbn'))go(1);else if(e.target.tagName==='IMG'){const im=e.target,r=im.getBoundingClientRect();zm=!zm;im.classList.toggle('z',zm);im.style.transformOrigin=((e.clientX-r.left)/r.width*100)+'% '+((e.clientY-r.top)/r.height*100)+'%'}return}
- const t=e.target.closest('.pd>div:first-child .ph img');if(t){const p=P.find(x=>x.id===sel.id);if(p&&p.imgs&&p.imgs.length)open(p.imgs,sel.gi||0)}});
+ const t=e.target.closest('.pd>div:first-child .ph img');if(t&&t.closest('.cbd')){const cl=[...t.closest('.cbd').querySelectorAll('.gal .th:not(.cov) img')].map(x=>x.getAttribute('src'));let ci=cl.indexOf(t.getAttribute('src'));if(ci<0)ci=0;if(cl.length)open(cl,ci);return}if(t){const p=P.find(x=>x.id===sel.id);if(p&&p.imgs&&p.imgs.length)open(p.imgs,sel.gi||0)}});
 document.addEventListener('keydown',e=>{const el=g();if(!el||el.hidden)return;if(e.key==='Escape')close();else if(e.key==='ArrowLeft')go(-1);else if(e.key==='ArrowRight')go(1)});
 window.addEventListener('hashchange',close);
 let sx=0,sy=0,inLb=false,inPd=false;document.addEventListener('touchstart',e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;const el=g();inLb=!!(el&&!el.hidden&&el.contains(e.target));inPd=!inLb&&!!e.target.closest('.pd>div:first-child .ph')},{passive:true});
