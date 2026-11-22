@@ -53,13 +53,13 @@ document.addEventListener('touchstart',e=>{if(e.target.closest('#slnew'))down=tr
 const hv=window.matchMedia&&matchMedia('(hover:hover)').matches;if(hv){document.addEventListener('mouseover',e=>{over=!!e.target.closest('#slnew')});document.addEventListener('mouseout',e=>{if(!e.relatedTarget||!e.relatedTarget.closest||!e.relatedTarget.closest('#slnew'))over=false})}
 document.addEventListener('wheel',e=>{if(e.target.closest('#slnew'))hd(1500)},{passive:true});
 document.addEventListener('click',e=>{if(e.target.closest('.slnav')){over=false;hd(2500)}});document.addEventListener('click',e=>{const b=e.target.closest('.slnav');if(!b)return;const sl=document.getElementById('slnew');if(sl&&sl.contains(b.parentElement.querySelector('.sl'))&&b.dataset.a==='slprev'&&sl.dataset.ml&&sl.scrollLeft<sl.clientWidth*.7)sl.scrollLeft+=sl.scrollWidth/2},true);
-function setup(sl){if(sl.dataset.ml)return;sl.dataset.ml=1;sl.style.scrollSnapType='none';const k=[...sl.children];k.forEach(c=>{const n=c.cloneNode(true);n.setAttribute('aria-hidden','true');n.querySelectorAll('a,button').forEach(x=>x.setAttribute('tabindex','-1'));sl.appendChild(n)});pos=sl.scrollLeft}
+function setup(sl){if(sl.dataset.ml)return;sl.dataset.ml=1;sl.style.scrollSnapType='none';const k=[...sl.children];k.forEach(c=>{const n=c.cloneNode(true);n.setAttribute('aria-hidden','true');n.querySelectorAll('a,button').forEach(x=>x.setAttribute('tabindex','-1'));sl.appendChild(n)});if(!document.getElementById('slfx')){const s=document.createElement('style');s.id='slfx';s.textContent='#slnew>.cd{transform:translate3d(var(--fx,0px),0,0)}';document.head.appendChild(s)}pos=sl.scrollLeft}
 function tick(t){requestAnimationFrame(tick);const sl=document.getElementById('slnew');if(!sl){el=null;return}
 if(sl!==el){el=sl;setup(sl);last=t;pos=sl.scrollLeft}
 const dt=Math.min(t-last,100)/1000;last=t;
-if(document.hidden||rm||down||over||Date.now()<hold||sl.children.length<2){pos=sl.scrollLeft;return}
-const half=sl.scrollWidth/2;if(half<sl.clientWidth)return;
-pos+=SP*dt;if(pos>=half)pos-=half;sl.scrollLeft=pos}
+if(document.hidden||rm||down||over||Date.now()<hold||sl.children.length<2){pos=sl.scrollLeft;sl.style.setProperty('--fx','0px');return}
+const gp=parseFloat(getComputedStyle(sl).columnGap)||0,half=(sl.scrollWidth+gp)/2;if(half<sl.clientWidth)return;
+pos+=SP*dt;if(pos>=half)pos-=half;const ip=Math.floor(pos);sl.scrollLeft=ip;sl.style.setProperty('--fx',(ip-pos).toFixed(3)+'px')}
 requestAnimationFrame(tick)})();
 document.addEventListener('click',e=>{if(!e.target.closest('.dd'))document.querySelectorAll('.ddm').forEach(x=>x.hidden=true)});
 
